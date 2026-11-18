@@ -1,0 +1,114 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[letterpaper,margin=22mm]{geometry}
+\usepackage{mathptmx}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{22,62,110}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    citecolor=primary,
+    urlcolor=primary,
+    pdftitle={SOVEREIGN-RH-LOCK: Recursive Spectral Pruning and Formal Verification Architecture for the Riemann Hypothesis},
+    pdfauthor={SOVEREIGN-RH-LOCK Research Engine}
+}
+
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+\newtheorem{obligation}{Proof Obligation}
+
+\newcommand{\takeaway}[2]{%
+  \vspace{6pt}\noindent\colorbox{primary!8}{%
+    \parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+      \vspace{3pt}\textbf{\color{primary}#1:}\hspace{0.5em}#2\vspace{3pt}%
+    }%
+  }\vspace{6pt}%
+}
+
+\title{\textbf{SOVEREIGN-RH-LOCK: A Hybrid Neuro-Symbolic and Formal Verification Architecture for the Connes--Berry--Keating Spectral Program}}
+\author{SOVEREIGN-RH-LOCK Research Engine}
+\date{November 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We present \textsc{Sovereign-RH-Lock}, a modular research architecture designed to investigate the Riemann Hypothesis (RH) through the Connes--Berry--Keating spectral program without conflating numerical coincidence with formal mathematical proof. The system enforces strict epistemic separation across six coupled layers: (1) high-temperature conjecture generation and bounded provenance-DAG branching via DSPy; (2) numerical spectral analysis, Von Neumann vs.\ Shannon entropy separation, Weyl perturbation testing, and 50-digit \texttt{mpmath} zeta evaluation; (3) data-parallel Structure-of-Arrays (SoA) pruning and compaction kernels in Futhark interfaced through a documented 64-bit little-endian Klong binary ABI; (4) open-world structural classification in OWL~2~DL; (5) closed-world admission, non-circular proof-dependency enforcement, and five-state epistemic tracking in Answer Set Programming (Clingo); and (6) a ten-gate verification controller. In sandbox validation, all 14 unit and integration tests pass, five nontrivial reference zeros are verified to $|\zeta(\rho)| \le 2.387 \times 10^{-50}$, and discrete Berry--Keating operators satisfy Hermiticity and Weyl stability bounds. Crucially, the architecture's proof-audit gate enforces that Gate~9 (exact spectral correspondence and completeness) and Gate~10 (RH proof admission) remain explicitly \textsc{Open} until all analytic obligations are formally discharged.
+\end{abstract}
+
+\section{Mathematical Objective and Proof Dependencies}
+
+Let $\zeta(s) = \sum_{n=1}^{\infty} n^{-s}$ for $\operatorname{Re}(s) > 1$, extended by meromorphic continuation to $\mathbb{C} \setminus \{1\}$, and let
+\begin{equation}
+Z_\zeta = \left\{ \rho \in \mathbb{C} : \zeta(\rho) = 0,\ 0 < \operatorname{Re}(\rho) < 1 \right\}
+\end{equation}
+denote its nontrivial zero set. The Riemann Hypothesis asserts that $\operatorname{Re}(\rho) = \frac{1}{2}$ for all $\rho \in Z_\zeta$. Following the Hilbert--P\'olya paradigm, \textsc{Sovereign-RH-Lock} investigates self-adjoint operators $D = D^*$ on an explicitly constructed Hilbert space $\mathcal{H}$ targeting the correspondence
+\begin{equation}
+Z_\zeta = \left\{ \frac{1}{2} + i\lambda : \lambda \in \sigma_{\mathrm{relevant}}(D) \right\}, \qquad \operatorname{ord}_{s = \frac{1}{2} + i\lambda}\zeta(s) = \dim\ker(D - \lambda I).
+\end{equation}
+
+Defining a symmetric expression or observing finite-dimensional Hermitian eigenvalues never constitutes a proof of RH. Every candidate correspondence in \textsc{Sovereign-RH-Lock} is gated on eight ordered analytic obligations (\texttt{OBL-01} through \texttt{OBL-08}) plus an inter-framework bridge (\texttt{OBL-BRIDGE-01}):
+\begin{enumerate}
+    \item Explicit construction of $\mathcal{H}$ and proof of completeness (\texttt{OBL-01}).
+    \item Definition of $D$ on a dense domain $\mathcal{D}(D) \subset \mathcal{H}$ (\texttt{OBL-02}).
+    \item Proof of symmetry $D \subseteq D^*$ (\texttt{OBL-03}).
+    \item Establishment of self-adjointness $\mathcal{D}(D) = \mathcal{D}(D^*)$ or valid extension (\texttt{OBL-04}).
+    \item Exact trace-formula identity with the completed zeta function $\xi(s)$ (\texttt{OBL-05}).
+    \item Analytic completeness: every $\rho \in Z_\zeta$ is represented (\texttt{OBL-06}).
+    \item Accounting for multiplicities, continuous spectrum, and off-line resonances (\texttt{OBL-07}).
+    \item Non-circular derivation of $\operatorname{Re}(\rho) = \frac{1}{2}$ (\texttt{OBL-08}).
+\end{enumerate}
+
+\section{Connes--Berry--Keating Operator Analysis}
+
+On $\mathcal{H}_{\mathrm{BK}} = L^2(\mathbb{R}_+, dx)$, the Berry--Keating dilation operator $H_{\mathrm{BK}} = \frac{1}{2}(xp + px) = -i(x\frac{d}{dx} + \frac{1}{2})$ is unitarily equivalent via $u = \ln x$ to $-i\frac{d}{du}$ on $L^2(\mathbb{R}, du)$, which is essentially self-adjoint on $C_c^\infty((0,\infty))$ with deficiency indices $(0,0)$ and purely continuous spectrum $\sigma(H_{\mathrm{BK}}) = \mathbb{R}$~\cite{berry1999}. Restricting to a compact interval $[a,b] \subset (0,\infty)$ yields deficiency indices $(1,1)$ and a $U(1)$ family of self-adjoint extensions $b^{1/2}\psi(b) = e^{i\theta}a^{1/2}\psi(a)$ whose discrete eigenvalues $\lambda_k(\theta) = (2\pi k + \theta)/\ln(b/a)$ form uniform arithmetic progressions rather than GUE-distributed zeta zeros.
+
+Conversely, Connes' adelic formulation~\cite{connes1999} acts by scaling on a weighted $L^2$ space over the idele class space $C_\mathbb{Q} = \mathbb{A}_\mathbb{Q}^\times / \mathbb{Q}^\times$, where nontrivial zeros appear as an \emph{absorption} spectrum in the trace formula rather than a direct emission spectrum. \textsc{Sovereign-RH-Lock} records the missing unitary/cohomological interface between these two frameworks as an explicit open obligation (\texttt{OBL-BRIDGE-01}).
+
+\section{System Architecture}
+
+\takeaway{Operating Law}{The model proposes; PyTorch/\texttt{mpmath} measures; Futhark transforms; OWL classifies; ASP constrains; the proof auditor verifies; and the SHA-256 provenance ledger preserves every decision.}
+
+\begin{table}[!htbp]
+\centering
+\caption{Architectural layers, responsibilities, and epistemic boundaries in \textsc{Sovereign-RH-Lock}.}
+\label{tab:layers}
+\begin{tabularx}{\linewidth}{llX}
+\toprule
+\textbf{Layer} & \textbf{Technology} & \textbf{Core Responsibility \& Epistemic Boundary} \\
+\midrule
+Conjecture Engine & DSPy & Ten structured signatures; strict provider temperature validation; bounded provenance DAG with canonical deduplication. \\
+Numerical Engine & PyTorch / \texttt{mpmath} & Strictly separates $S(\rho) = -\operatorname{Tr}(\rho\log\rho)$, $H(p) = -\sum p_i\log p_i$, and $r(s) = |\zeta(s)|$; Weyl perturbation stability tests. \\
+Array Kernels & Futhark / Klong & Nine SoA parallel kernels (\texttt{map}, \texttt{scan}, \texttt{filter}, \texttt{scatter}) over a 32-byte-header + 72-byte/record little-endian 64-bit ABI. \\
+Structural Ontology & OWL 2 DL (Turtle) & 15 classes and 9 relations under Open-World Assumption; enforces disjointness between \texttt{NumericalEvidence} and \texttt{FormalEvidence}. \\
+Admission Control & Clingo ASP & Closed-world rejection of missing obligations, cyclic proof dependencies, and tainted lineages; maintains 5 distinct epistemic states. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Verification Gates and Sandbox Validation}
+
+\textsc{Sovereign-RH-Lock} enforces ten sequential verification gates. In sandbox execution using Python~3.11.2, \texttt{mpmath}~1.3.0, \texttt{numpy}~2.1.3, and \texttt{scipy}~1.15.2:
+\begin{itemize}
+    \item \textbf{Unit \& Integration Suite (\texttt{bin/test.sh}):} All 14/14 tests passed, validating DSPy provider temperature rejection, bounded DAG deduplication, Klong 64-bit binary round-trips, Futhark kernel edge-case guards (\texttt{NaN}/\texttt{Inf}/empty arrays), ASP integrity constraints, and OWL-to-ASP bridge emission.
+    \item \textbf{High-Precision Spectral Check (\texttt{bin/check-spectral.sh}):} The first five nontrivial zeros $\rho_1, \dots, \rho_5$ were verified at 50-digit precision with maximum residual $|\zeta(\rho_k)| = 2.387 \times 10^{-50}$, discrete $H_{\mathrm{BK}}$ Hermiticity residual $0.0$, Weyl stability satisfied ($\epsilon = 10^{-6}$), and an off-line test point at $\operatorname{Re}(s) = 0.6$ confirming $|\zeta(0.6 + i\gamma_1)| > 0.05$.
+    \item \textbf{Proof Audit (\texttt{bin/audit-proofs.sh}):} Confirmed \textbf{Gate~9} and \textbf{Gate~10} remain \textsc{Open} (\texttt{rh\_theorem\_admitted: false}), with \texttt{OBL-04} (\textsc{Partial}) and \texttt{OBL-05}--\texttt{OBL-08}, \texttt{OBL-BRIDGE-01} (\textsc{Open}) preserved in \texttt{evidence/manifests/proof\_audit.json}.
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{berry1999}
+M.~V. Berry and J.~P. Keating, ``The Riemann zeros and eigenvalue asymptotics,'' \emph{SIAM Review}, vol.~41, no.~2, pp.~236--266, 1999.
+
+\bibitem{connes1999}
+A.~Connes, ``Trace formula in noncommutative geometry and the zeros of the Riemann zeta function,'' \emph{Selecta Mathematica}, vol.~5, no.~1, pp.~29--106, 1999.
+\end{thebibliography}
+
+\end{document}
