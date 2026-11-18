@@ -45,3 +45,9 @@ jobs:
       - name: No sorry / admit in the checked sources
         run: |
           if grep -rnwE 'sorry|admit' --include=*.lean ReimannOperatorChecked ReimannOperatorChecked.lean; then exit 1; fi
+      - name: Axioms of lean/SovereignRHLock.lean (fails on sorryAx)
+        run: |
+          lake env lean AxiomCheckSovereign.lean | tee axioms_sovereign.txt
+          if grep -q sorryAx axioms_sovereign.txt; then exit 1; fi
+          # only Lean's built-in axioms are allowed (no sorryAx, no custom axioms)
+          if grep 'depends on axioms' axioms_sovereign.txt | grep -vE '\[((propext|Quot\.sound|Classical\.choice)(, )?)+\]$'; then exit 1; fi

@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Ahmad Ali Parr / SnapKitty Research Lab
 name = "ReimannOperatorChecked"
 version = "0.1.0"
-defaultTargets = ["ReimannOperatorChecked"]
+defaultTargets = ["ReimannOperatorChecked", "SovereignRHLock"]
 
 [[require]]
 name = "mathlib"
@@ -11,3 +11,9 @@ rev = "v4.34.0-rc1"
 
 [[lean_lib]]
 name = "ReimannOperatorChecked"
+
+# lean/SovereignRHLock.lean (Lean core only), built in place from the original lean/ folder
+[[lean_lib]]
+name = "SovereignRHLock"
+srcDir = "../lean"
+roots = ["SovereignRHLock"]
