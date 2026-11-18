@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-SnapKitty-Opaque-1.0
+# Copyright (C) 2026 Ahmad Ali Parr / SnapKitty Research Lab
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lean:
+    name: Lean (lean-checked, lake build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lean-checked
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Fetch Mathlib cache
+        run: lake exe cache get
+      - name: lake build
+        run: lake build
+      - name: Axioms (fails on sorryAx)
+        run: |
+          lake env lean AxiomCheck.lean | tee axioms.txt
+          if grep -q sorryAx axioms.txt; then exit 1; fi
+      - name: No sorry / admit in the checked sources
+        run: |
+          if grep -rnwE 'sorry|admit' --include=*.lean ReimannOperatorChecked ReimannOperatorChecked.lean; then exit 1; fi
