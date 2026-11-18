@@ -1,0 +1,33 @@
+[
+ {
+  "hypothesis_id": "Conjecture_BK_RH",
+  "generation": 2,
+  "parent_ids": [
+   "H_BK-Operator",
+   "9root"
+  ],
+  "is_numeric": true,
+  "is_spectral": true,
+  "obligations": [
+   "OBL_04_SelfAdjointness",
+   "OBL_05_TraceFormula"
+  ],
+  "discharged_obligations": [
+   "OBL_04_SelfAdjointness"
+  ],
+  "evidence_ids": [
+   "EV_num_1",
+   "EV-formal"
+  ],
+  "evidence_verified": {
+   "EV_num_1": true
+  },
+  "evidence_refuted": {
+   "EV-formal": true
+  }
+ },
+ {
+  "hypothesis_id": "X",
+  "generation": 3.7
+ }
+]
