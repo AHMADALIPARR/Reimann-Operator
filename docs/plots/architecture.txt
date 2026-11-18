@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-SnapKitty-Opaque-1.0
+# Copyright (C) 2026 Ahmad Ali Parr / SnapKitty Research Lab
+# Diagram spec for architecture.awk.
+# size W H
+# box  id x y w h style | line | line ...      (style: in, c, f, pl, lean, test)
+# edge from to [label]                          (right->left if to is right of from, else bottom->top)
+size 900 350
+title Reimann-Operator: data flow of the native engine and the Lean project
+box oracle 20 44 190 44 in | data/zeta_zeros_oracle.txt | 511 reference zeros
+box json 20 112 190 44 in | JSON matrices, spectra, | candidates, research records
+box ttl 20 196 190 44 in | owl/rh_ontology.ttl | OWL 2 DL in Turtle
+box ro 270 64 200 72 c | ro (C23) | CLI, json.dumps-exact JSON, | SHA-256 ledger, PCG64 RNG
+box f90 540 54 200 92 f | ro_kernels.f90 (Fortran 2008) | ζ(s), Hardy Z, zeros in REAL(16) | Jacobi eigenvalues, entropy, | priority scores
+box pl 270 190 200 56 pl | ontology_bridge.pl | SWI-Prolog semweb + DCG
+box asp 540 190 200 56 pl | ASP facts | for the Clingo programs in asp/
+box test 790 112 96 58 test | ctest | golden + oracle
+box lsrc 20 290 190 44 lean | lean/RiemannDiracOperator.lean | operator file
+box gen 270 290 200 44 lean | gen_dirac_lemmas 16 | 68 lemmas over D^0 … D^16
+box lake 540 290 200 44 lean | lean-checked: lake build | Mathlib, #print axioms
+edge oracle ro
+edge json ro
+edge ttl pl
+edge ro f90 ISO_C_BINDING
+edge pl asp
+edge f90 test
+edge asp test
+edge lsrc gen
+edge gen lake
