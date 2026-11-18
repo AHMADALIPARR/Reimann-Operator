@@ -1,10 +1,79 @@
 # Reimann-Operator
 
+```
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║   ██╗   ██╗███╗   ██╗██╗██╗   ██╗███████╗██████╗ ███████╗ █████╗ ██╗          ║
+║   ██║   ██║████╗  ██║██║██║   ██║██╔═════██╔══██╗██╔═════██╔══██╗██║          ║
+║   ██║   ██║██╔██╗ ██║██║██║   ██║█████╗  ██████╔═███████╗███████║██║          ║
+║   ██║   ██║██║╚██╗██║██║╚██╗ ██╔═██╔═══██╔══██╗╚════██║██╔══██║██║          ║
+║   ╚██████╔═██║ ╚████║██║ ╚████╔═ ███████╗██║  ██║███████║██║  ██║███████╗     ║
+║    ╚══════ ╚══ ╚═════╚══  ╚════ ╚═══════╚══  ╚══╚══════╚══  ╚══╚═══════     ║
+║                                                                              ║
+║              ██████╗ ██████╗      ██╗███████╗ ██████╗████████╗                ║
+║              ██╔══██╗██╔══██╗     ██║██╔═════██╔═════╚══██╔═══                ║
+║              ██████╔═██████╔═     ██║█████╗  ██║        ██║                   ║
+║              ██╔════ ██╔══██╗██   ██║██╔═══  ██║        ██║                   ║
+║              ██║     ██║  ██║╚█████╔═███████╗╚██████╗   ██║                   ║
+║              ╚══     ╚══  ╚══ ╚════ ╚═══════ ╚══════   ╚══                   ║
+║                                                                              ║
+║   ┌──────────────────────────────────────────────────────────────────────────┐     ║
+║   │  LEGACY OF THE UNIVERSAL OBJECT                                    │     ║
+║   │  ──────────────────────────────────                                 │     ║
+║   │                                                                    │     ║
+║   │  The Object that contains all Objects.                             │     ║
+║   │  The spectrum that encodes the zeros.                              │     ║
+║   │  Self-adjointness locks the line.                                  │     ║
+║   │                                                                    │     ║
+║   │  ζ(s) = 0  ⟹  Re(s) = ½                                            │     ║
+║   │                                                                    │     ║
+║   │  [CRITICAL LINE LOCKED]  [ADELLES INITIALIZED]  [TRACE FORMULA]    │     ║
+║   └──────────────────────────────────────────────────────────────────────────┘     ║
+║                                                                              ║
+║   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   ║
+║   ░ SPECTRAL TRACE :: ZETA ZEROS ON THE CRITICAL LINE ░░░░░░░░░░░░░░░░░░░   ║
+║   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   ║
+║                                                                              ║
+║        │                                                                     ║
+║    ½ ──┼────────────────────────────────────────────────────────────────────   ║
+║        │     ●          ●              ●         ●           ●              ║
+║        │         ●            ●    ●        ●         ●                      ║
+║        │    ●         ●           ●     ●        ●          ●     ●         ║
+║        │        ●          ●         ●      ●          ●                    ║
+║        │  ●         ●            ●        ●      ●           ●              ║
+║        │                                                                     ║
+║   ─────┴───────────────────────────────────────────────────────────────────   ║
+║   Im(s) →                                                                   ║
+║                                                                              ║
+║   First zeros (approx):                                                     ║
+║   ½ + 14.134725i    ½ + 21.022040i    ½ + 25.010858i    ½ + 30.424876i      ║
+║   ½ + 32.935062i    ½ + 37.586178i    ½ + 40.918719i    ½ + 43.327073i      ║
+║                                                                              ║
+║   ╔═════════════════════════════════════════════════════════════════════════╗     ║
+║   ║  // SOVEREIGN-RH-LOCK //                                           ║     ║
+║   ║  // UNIVERSAL OBJECT LEGACY ACTIVE //                              ║     ║
+║   ║  // SELF-ADJOINTNESS → REAL SPECTRUM → CRITICAL LINE //            ║     ║
+║   ║  // OPEN WORLD ONTOLOGY · CLOSED WORLD ADMISSION · TRACE POSITIVE //║    ║
+║   ╚═══════════════════════════════════════════════════════════════════════════╝     ║
+║                                                                              ║
+║   [STATUS]  SPECTRUM REAL  ·  ZEROS LOCKED  ·  OBJECT SOVEREIGN             ║
+║                                                                              ║
+╚═════════════════════════════════════════════════════════════════════════════════╝
+```
+
 **The Riemann Hypothesis formalized as a consequence of self-adjointness of a Dirac-type operator on the non-commutative geometry of the adeles.**
 
 SOVEREIGN-RH-LOCK explores the Connes–Berry–Keating approach: the non-trivial zeros of the Riemann zeta function correspond to eigenvalues of a self-adjoint operator on an adelic Hilbert space. Self-adjointness forces the spectrum to be real, which (under the spectral correspondence) places all zeros on the critical line Re(s) = 1/2.
 
 The repository combines a Lean 4 formal core, Clingo admission rules, Fortran numerical kernels, a C23 command-line engine, SWI-Prolog for the Turtle/OWL ontology, Futhark array kernels and a Klong interchange adapter. The native engine has no third-party dependencies: no LAPACK, no BLAS, no JSON or crypto library.
+
+## Spectral Theme
+
+![Riemann zeta zeros on the critical line, cyberpunk holographic visualization](docs/images/zeta_critical_line_cyberpunk.jpg)
+
+![Spectral operator on adeles, self-adjoint lock, neon Universal Object](docs/images/spectral_operator_adeles.jpg)
+
+*Cyberpunk spectral theme: zeros locked on the critical line, self-adjointness as the sovereign lock. Generated for the Universal Object legacy.*
 
 ## Architecture
 
@@ -189,6 +258,8 @@ Each run is a fresh process, so the Python column includes interpreter start-up 
 
 `paper/sovereign_rh_lock.tex` is the full paper, grown from the original draft `paper/sovereign_rh_lock_grounding.tex`; CI builds it with LaTeX (`cd paper && latexmk -pdf sovereign_rh_lock.tex`).
 
+The built PDF is available as an artifact from the CI run or can be generated locally with tectonic or latexmk.
+
 ## Data formats
 
 - **Klong SoA binary**: 32-byte header `"SRHLK64\0"`, version, N and column count (9) as little-endian `int64`, then nine columns of N little-endian 8-byte values: `candidate_id`, `parent_id`, `generation` (int64), `zero_real`, `zero_imag`, `eigenvalue_real`, `entropy`, `residual` (float64), `status` (int64; 1 active, 2 pruned, −1 invalid).
@@ -220,7 +291,7 @@ Each run is a fresh process, so the Python column includes interpreter start-up 
 ├── data/zeta_zeros_oracle.txt     # Zeta zero oracle
 ├── docs/zeta_cyberpunk_ascii.txt  # Legacy of the Universal Object (ASCII)
 ├── docs/plots/                     # AWK and Prolog figure generators
-├── docs/images/                    # Generated SVG figures
+├── docs/images/                    # Generated SVG figures and theme images
 ├── docs/quantum/quantum_approach.md # Quantum approach write-up
 ├── openqasm/                      # OpenQASM 3.0 block encodings
 ├── paper/                         # LaTeX paper, its draft and figure data
