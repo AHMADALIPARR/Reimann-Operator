@@ -181,6 +181,14 @@ Median wall time from [hyperfine](https://github.com/sharkdp/hyperfine) 1.19 (`-
 
 Each run is a fresh process, so the Python column includes interpreter start-up and imports (a trivial input takes about 66 ms). The eigenvalue matrices come from `ro bk n 1.0 10.0 0.3` and the candidates are 10 000 random records; the entropy inputs are `tests/fixtures/rho_valid4.json` and `p_skew.json`. The port's eigen-solver is a dependency-free Jacobi sweep on the real 2n × 2n embedding, so it falls behind NumPy's LAPACK path past n ≈ 100. A single zero is evaluated in software `REAL(16)`, slower than mpmath at 30 digits, while `ro zeros` finds all 511 in one sign scan of Z(t).
 
+## Quantum approach
+
+`openqasm/` holds two OpenQASM 3.0 block encodings on 4 data qubits and one ancilla: `circulant_qft_bk.qasm` (QFT, diagonal phase stage, inverse QFT, aimed at the periodic Berry–Keating stencil) and `periodic_diagonal_lcu.qasm` (cos(ωj + φ) on the diagonal as a one-ancilla LCU). Both parse under the OpenQASM 3 reference ANTLR grammar. `lean/SovereignRHLock.lean` formalises the proof-obligation gates (Gate 10 stays closed while Gate 9 or OBL-06 is open) in core Lean; `lean-checked` builds it and CI rejects any axiom beyond `propext`, `Quot.sound` and `Classical.choice`. The full write-up is `docs/quantum/quantum_approach.md`.
+
+## Paper
+
+`paper/sovereign_rh_lock.tex` is the full paper, grown from the original draft `paper/sovereign_rh_lock_grounding.tex`; CI builds it with LaTeX (`cd paper && latexmk -pdf sovereign_rh_lock.tex`).
+
 ## Data formats
 
 - **Klong SoA binary**: 32-byte header `"SRHLK64\0"`, version, N and column count (9) as little-endian `int64`, then nine columns of N little-endian 8-byte values: `candidate_id`, `parent_id`, `generation` (int64), `zero_real`, `zero_imag`, `eigenvalue_real`, `entropy`, `residual` (float64), `status` (int64; 1 active, 2 pruned, −1 invalid).
@@ -190,8 +198,9 @@ Each run is a fresh process, so the Python column includes interpreter start-up 
 
 ```
 .
-├── lean/                          # Original Lean operator file
-│   └── RiemannDiracOperator.lean
+├── lean/                          # Original Lean files
+│   ├── RiemannDiracOperator.lean
+│   └── SovereignRHLock.lean       # Proof-obligation gates (core Lean)
 ├── lean-checked/                  # Lake project that compiles it (Mathlib v4.34.0-rc1)
 │   ├── ReimannOperatorChecked/
 │   │   ├── RiemannDiracOperator_checked.lean
@@ -212,6 +221,9 @@ Each run is a fresh process, so the Python column includes interpreter start-up 
 ├── docs/zeta_cyberpunk_ascii.txt  # Legacy of the Universal Object (ASCII)
 ├── docs/plots/                     # AWK and Prolog figure generators
 ├── docs/images/                    # Generated SVG figures
+├── docs/quantum/quantum_approach.md # Quantum approach write-up
+├── openqasm/                      # OpenQASM 3.0 block encodings
+├── paper/                         # LaTeX paper, its draft and figure data
 ├── tests/                         # Cases, fixtures, golden outputs, runners
 ├── CMakeLists.txt
 └── .github/workflows/ci.yml       # native (Fortran, C23, Prolog) and Lean jobs
