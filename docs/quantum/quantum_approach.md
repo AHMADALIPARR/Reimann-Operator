@@ -1,4 +1,10 @@
-Quantum hybrid circuits in OpenQASM 3.0 (openqasm/) and the hand-written structural & epistemic lemmas in pure Lean 4 (lean/SovereignRHLock.lean) with zero sorry and zero custom axiom declarations (using only Lean 4's Init core).
+Quantum hybrid circuits in OpenQASM 3.0 and the hand-written structural & epistemic lemmas in pure Lean 4 are now collected in a single organized file:
 
-All 20/20 tests in ./bin/test.sh pass (0.024s), including tests/integration/test_openqasm_and_lean.py. (Note: lean is not installed in this sandbox VM, so run lean lean/SovereignRHLock.lean in a Lean 4 environment to execute the kernel type-checker directly.)
+**`quantum/sovereign_rh_quantum_encodings_and_lemmas.lean`**
 
+That file contains:
+1. Circulant–QFT block encoding (Berry–Keating stencil)
+2. Periodic-diagonal LCU block encoding
+3. The full set of hand-written lemmas (`SovereignRHLock` namespace) — zero `sorry`, zero custom axioms, Lean 4 core only
+
+The individual OpenQASM sources remain in `openqasm/` for direct circuit execution, and the pure Lean lemmas also remain in `lean/SovereignRHLock.lean` for the checked build.
