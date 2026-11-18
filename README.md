@@ -4,91 +4,191 @@
 
 SOVEREIGN-RH-LOCK explores the Connes–Berry–Keating approach: the non-trivial zeros of the Riemann zeta function correspond to eigenvalues of a self-adjoint operator on an adelic Hilbert space. Self-adjointness forces the spectrum to be real, which (under the spectral correspondence) places all zeros on the critical line Re(s) = 1/2.
 
-This repository combines formal verification, declarative constraint solving, numerical spectral methods, and knowledge representation.
+The repository combines a Lean 4 formal core, Clingo admission rules, Fortran numerical kernels, a C23 command-line engine, SWI-Prolog for the Turtle/OWL ontology, Futhark array kernels and a Klong interchange adapter. The native engine has no third-party dependencies: no LAPACK, no BLAS, no JSON or crypto library.
 
-## Architecture Overview
+## Architecture
 
 | Layer | Technology | Role |
 |-------|------------|------|
-| Formal core | Lean 4 + Mathlib | Self-adjointness → real spectrum → critical line |
+| Formal core | Lean 4 + Mathlib | Self-adjointness → real eigenvalues → critical line, plus generated lemma families |
 | Epistemic admission | Clingo (ASP) | Closed-world proof obligations, rejection of incomplete claims |
-| Numerical engine | PyTorch + mpmath | High-precision residual checks, entropy, candidate ranking |
+| Numerical kernels | Fortran 2008 (`REAL(16)` where precision matters) | Hermitian eigenvalues, zeta and its zeros, entropy, priority scores |
+| Engine and CLI | C23 | `ro`: spectral, entropy, candidate ledger, research DAG, oracle check |
+| Knowledge graph | OWL 2 DL in Turtle, SWI-Prolog | Ontology parsing, validation, OWL → ASP facts |
 | GPU kernels | Futhark | Flat-array SoA compaction, spectral filtering, pruning |
-| Knowledge graph | OWL 2 DL | Open-world structural ontology of operators, zeros, evidence |
-| Research automation | DSPy | Hypothesis generation, counterexample search, proof audit |
 | Interchange | Klong | 64-bit SoA binary format for candidate arrays |
+| Reference data | `data/zeta_zeros_oracle.txt` | Imaginary parts of the first 511 non-trivial zeros |
 
-## Quick Start
+## Features
 
-### Lean formalization
+- **Lean formal core** (`lean-checked/`): the Dirac operator structure with its three fields (operator, `self_adjoint`, `spectral_correspondence`), the proof that a self-adjoint operator has real eigenvalues, and `critical_line_of_dirac_operator`, which derives `s.re = 1/2` for every non-trivial zero from an instance of `RiemannDiracOperator`. Builds with zero `sorry`.
+- **Recursive lemma generation**: the `gen_dirac_lemmas N` command walks the powers `D^0 … D^N` of the operator and emits four lemmas per level, each level proved from the one below it. `gen_dirac_lemmas 16` produces 68 lemmas.
+- **Zeta in quad precision**: ζ(s) by Euler–Maclaurin in `REAL(16)`, Hardy's Z(t) with the Riemann–Siegel θ, and the k-th zero by a sign scan of Z(t) refined in `REAL(16)`. All 511 zeros of the oracle are recomputed in CI.
+- **Berry–Keating discretization** of H = −i(x d/dx + 1/2) on [a, b] with a twisted periodic boundary, Hermitian residuals, eigenvalues, spacing statistics (mean, std, ⟨r⟩) and Weyl perturbation tests seeded exactly like `numpy.random.default_rng`.
+- **Entropy**: Shannon H(p) and von Neumann S(ρ) with Hermitian, trace and positivity checks.
+- **Candidates**: priority score J(C) = w1·I + w2·N + w3·D − w4·R, deterministic ranking, an append-only SHA-256 chained provenance ledger, and the 32-byte-header Klong SoA binary format.
+- **Research engine**: provider temperature limits, CandidateRecord provenance hashes, the bounded research DAG (depth, total-candidate and duplicate-statement limits, parent checks), the verification metric and top-k selection.
+- **OWL → ASP bridge** in Prolog: reads the Turtle ontology, validates the 15 required classes, 9 required relations and disjointness, and emits ASP facts for individuals and candidate records. `check` also loads the file with SWI-Prolog's semweb Turtle parser and counts the RDF triples.
+
+## Quick start
+
+### Native engine (Fortran + C23 + Prolog tests)
 ```bash
-# Requires elan / Lean 4
-lake update
-lake exe cache get    # prebuilt Mathlib (v4.14.0)
-lake build
+sudo apt-get install -y gfortran cmake swi-prolog-nox
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j1
+ctest --test-dir build --output-on-failure
 ```
-Source: `lean/RiemannDiracOperator.lean`
+
+### Lean
+```bash
+cd lean-checked
+lake exe cache get    # prebuilt Mathlib (v4.34.0-rc1)
+lake build
+lake env lean AxiomCheck.lean
+```
 
 ### Answer Set Programming (Clingo)
 ```bash
 clingo asp/proof_admission.lp asp/spectral_constraints.lp asp/recursive_pruning.lp 0
 ```
 
-### Numerical / spectral (Python)
-```bash
-pip install torch numpy mpmath
-python -c "from torch.spectral import zeta_residual; print(zeta_residual(0.5, 14.134725))"
+## CLI: `ro`
+
+```text
+ro herm-res M.json              ||D − D*||_F
+ro eigvalsh M.json              eigenvalues of a Hermitian matrix, ascending
+ro bk n a b theta               Berry–Keating matrix as [[re, im], …] rows
+ro zeta-res sigma t [dps]       [|ζ(σ + it)|, 10^-(dps-5)]
+ro zetazero k [dps]             {"index", "real", "imag", "residual", "dps"} for the k-th zero
+ro zeros kmax                   imaginary parts of zeros 1..kmax
+ro spacing ev.json              {"count", "mean_spacing", "std_spacing", "mean_ratio"}
+ro perturb M.json [eps] [seed]  Weyl test: max eigenvalue shift vs ||E||_2
+ro shannon p.json               H(p) for a vector, or per row of a matrix
+ro vn-entropy M.json [tol]      S(ρ) = −Tr ρ log ρ
+ro entropy-bounds value dim     0 ≤ S ≤ log(dim)
+ro rank C.json                  [[candidate_id, J(C)], …] by J(C) then id
+ro ledger C.json                SHA-256 chained ledger hashes
+ro pack C.json out.bin          Klong SoA binary
+ro unpack in.bin                candidates from a SoA binary
+ro provider model               provider prefix of a model name
+ro temp model t                 temperature checked against the provider limit
+ro lm-config                    exploratory and verdict LM settings from SOVEREIGN_* env
+ro provenance R.json            CandidateRecord provenance hashes
+ro dag R.json [depth b total]   bounded research DAG run
+ro metric R.json                verification metric per record
+ro select R.json k              top-k records by metric, then hypothesis id
+ro oracle-check oracle.txt [k]  recompute every oracle zero and compare
+ro cmp expected actual [rtol] [atol]   JSON comparison used by the tests
 ```
 
-## Directory Structure
+Matrices are JSON lists of rows; an entry is a number or `[re, im]`. Output is JSON in the same form `json.dumps` writes. Errors print `ValueError: <message>` and exit 1.
+
+### Prolog
+```bash
+swipl owl/ontology_bridge.pl summary  owl/rh_ontology.ttl
+swipl owl/ontology_bridge.pl validate owl/rh_ontology.ttl
+swipl owl/ontology_bridge.pl facts    owl/rh_ontology.ttl [candidates.json]
+swipl owl/ontology_bridge.pl check    owl/rh_ontology.ttl [--structural]
+swipl dspy/signatures.pl [roles]
+```
+
+## Lean
+
+`lean/RiemannDiracOperator.lean` is the original operator file. `lean-checked/` is a separate Lake project (Lean v4.34.0-rc1, Mathlib v4.34.0-rc1) whose `RiemannDiracOperator_checked.lean` compiles it:
+
+- `nonTrivialZero s` is `riemannZeta s = 0 ∧ 0 < s.re ∧ s.re < 1`, using Mathlib's `riemannZeta`.
+- The spectral correspondence pairs a non-trivial zero with an eigenvalue μ of the operator through `s = 1/2 + I * μ`.
+- `eigenvalue_im_eq_zero`: an eigenvalue of an operator with ⟨Au, v⟩ = ⟨u, Av⟩ has zero imaginary part.
+- `im_zero_of_real_shift`: with the original's `λ = s − 1/2`, a real λ gives `s.im = 0`.
+- `critical_line_of_dirac_operator` and `all_nontrivial_zeros_on_line`: every non-trivial zero has `s.re = 1/2` for any `D : RiemannDiracOperator H`.
+
+`gen_dirac_lemmas N` is a Lean command elaborator. Level `k` emits:
+
+| Lemma | Statement | Proof |
+|-------|-----------|-------|
+| `pow_k_selfAdjoint` | `D^k` is self-adjoint | from `pow_(k-1)_selfAdjoint` and `D.self_adjoint` |
+| `pow_k_eigenvalue_real` | eigenvalues of `D^k` are real | from `pow_k_selfAdjoint` |
+| `pow_k_inner_real` | ⟨D^k v, v⟩ is real | from `pow_k_selfAdjoint` |
+| `trunc_k_nullspace` | a rank-one truncation on `RealVec k` kills vectors orthogonal to its right factor | `outer_product_nullspace` |
+
+The closed form `selfAdjointRel_pow` (all `n`, by induction) sits next to the generated instances. `AxiomCheck.lean` prints the axioms of the main theorems and the top generated level; CI fails if `sorryAx` appears.
+
+Lemmas taken from [AHMADALIPARR/riemann-gas](https://github.com/AHMADALIPARR/riemann-gas) at `be609fa` (the source file and commit are noted in each file):
+
+- `RiemannGas/ZetaTruncationProof.lean`: the whole of `lean/ZetaTruncationProof.lean` (`alloy_red2_discontinuity`, `second_connector_fails_reachability`, `outer_product_nullspace`), with its import moved from `Mathlib.Basic.Real.Basic` to `Mathlib.Data.Real.Basic`.
+- `RiemannGas/WeilBound.lean`: `WeilBound`, `weil_bound_exists`, `weil_bound_genus_two` from `lean/DMZ_F2_Decomposition.lean`.
+
+## Python sources and their ports
+
+| Python | Port | Language |
+|--------|------|----------|
+| `torch/spectral.py` | `kernels/ro_kernels.f90` (eigenvalues, zeta, zeros, sums), `src/ro_main.c` (`herm-res`, `eigvalsh`, `bk`, `zeta-res`, `zetazero`, `spacing`, `perturb`), `src/ro_numpy_rng.c` | Fortran, C23 |
+| `torch/entropy.py` | `kernels/ro_kernels.f90` (`ro_shannon`, `ro_vn_entropy`), `src/ro_main.c` (`shannon`, `vn-entropy`, `entropy-bounds`) | Fortran, C23 |
+| `torch/candidates.py` | `kernels/ro_kernels.f90` (`ro_priority`), `src/ro_main.c` (`rank`, `ledger`, `pack`, `unpack`), `src/ro_sha256.c` | Fortran, C23 |
+| `dspy/research_engine.py` | `src/ro_main.c` (`provider`, `temp`, `lm-config`, `provenance`, `dag`) | C23 |
+| `dspy/candidate_optimizer.py` | `src/ro_main.c` (`metric`, `select`) | C23 |
+| `dspy/signatures.py` | `dspy/signatures.pl` | SWI-Prolog |
+| `owl/ontology_bridge.py` | `owl/ontology_bridge.pl` | SWI-Prolog |
+
+The Python files stay in the tree. `tests/golden/` holds what the Python printed for every test case. CI runs only the ports and compares their output with those files, byte for byte except where an eigen-solver or a BLAS dot product sets the last bits; those cases carry a tolerance in `tests/cases.txt`.
+
+## Oracle
+
+`data/zeta_zeros_oracle.txt` lists `index imaginary-part` for the first 511 non-trivial zeros, to 10 decimals (the first row carries no index and is read as zero 1). `ro oracle-check` recomputes every zero with the Fortran kernel and requires agreement to the oracle's rounding. It also reports |ζ(1/2 + it)| at each oracle value.
+
+## Data formats
+
+- **Klong SoA binary**: 32-byte header `"SRHLK64\0"`, version, N and column count (9) as little-endian `int64`, then nine columns of N little-endian 8-byte values: `candidate_id`, `parent_id`, `generation` (int64), `zero_real`, `zero_imag`, `eigenvalue_real`, `entropy`, `residual` (float64), `status` (int64; 1 active, 2 pruned, −1 invalid).
+- **Ledger entry**: SHA-256 of the compact, key-sorted JSON of `prev_hash`, the candidate fields and `note`; the first `prev_hash` is 64 zeros.
+
+## Layout
 
 ```
 .
-├── lean/                          # Lean 4 formalization (Mathlib)
+├── lean/                          # Original Lean operator file
 │   └── RiemannDiracOperator.lean
-├── asp/                           # Clingo logic programs
-│   ├── proof_admission.lp          # 5 epistemic states, obligation discharge
-│   ├── spectral_constraints.lp     # Self-adjointness & domain rules
-│   └── recursive_pruning.lp        # Lineage & counterexample propagation
-├── futhark/                       # GPU kernels (SoA layout)
-│   ├── candidate_arrays.fut
-│   ├── recursive_prune.fut
-│   └── spectral_filter.fut
-├── torch/                         # Numerical spectral & entropy engine
-│   ├── spectral.py                # Berry–Keating discretization, zeta residuals
-│   ├── entropy.py                 # Von Neumann / Shannon entropy
-│   └── candidates.py              # Ranking, provenance ledger, Klong interchange
-├── owl/                           # OWL 2 DL ontology
+├── lean-checked/                  # Lake project that compiles it (Mathlib v4.34.0-rc1)
+│   ├── ReimannOperatorChecked/
+│   │   ├── RiemannDiracOperator_checked.lean
+│   │   └── RiemannGas/            # Lemmas from AHMADALIPARR/riemann-gas
+│   └── AxiomCheck.lean
+├── kernels/ro_kernels.f90         # Fortran numerical kernels
+├── src/, include/                 # C23 engine: ro CLI, JSON, SHA-256, NumPy RNG
+├── owl/                           # OWL 2 DL ontology, Python bridge, Prolog bridge
 │   ├── rh_ontology.ttl
-│   └── ontology_bridge.py         # OWL → ASP fact emission (OWA → CWA)
-├── dspy/                          # Conjecture & proof-audit engine
-│   ├── signatures.py
-│   ├── research_engine.py
-│   └── candidate_optimizer.py
-├── klong/                         # Flat-array interchange adapter
-│   └── interchange.k
-├── docs/                          # Visual artifacts
-│   └── zeta_cyberpunk_ascii.txt   # Legacy of the Universal Object (ASCII)
-├── lakefile.toml
-├── lean-toolchain
-└── LICENSE                       # AGPLv3
+│   ├── ontology_bridge.py
+│   └── ontology_bridge.pl
+├── asp/                           # Clingo logic programs
+├── futhark/                       # GPU kernels (SoA layout)
+├── torch/                         # Python numerical sources
+├── dspy/                          # Python research engine sources, signatures.pl
+├── klong/interchange.k            # Flat-array interchange adapter
+├── data/zeta_zeros_oracle.txt     # Zeta zero oracle
+├── docs/zeta_cyberpunk_ascii.txt  # Legacy of the Universal Object (ASCII)
+├── tests/                         # Cases, fixtures, golden outputs, runners
+├── CMakeLists.txt
+└── .github/workflows/ci.yml       # native (Fortran, C23, Prolog) and Lean jobs
 ```
 
-## Key Ideas
+## Key ideas
 
-- **Open-world (OWL)** vs **closed-world (ASP)**: Absence of a proof in the ontology is never turned into a logical refutation; it is emitted as a missing obligation that ASP then rejects.
-- **Numerical evidence ≠ formal proof**: Residual thresholds and entropy scores are search heuristics and screening gates only. They never promote a conjecture to a theorem.
-- **Provenance**: Numerically pruned candidates remain recorded in an append-only SHA-256 ledger (status = pruned).
-- **Self-adjointness lock**: The Lean development encodes the principle that denying the critical-line conclusion requires denying either the existence of adeles, the axioms of functional analysis, or the definition of self-adjointness.
-- **Legacy of the Universal Object**: See `docs/zeta_cyberpunk_ascii.txt` for the spectral manifest.
+- **Open-world (OWL)** vs **closed-world (ASP)**: absence of a proof in the ontology is never turned into a logical refutation; it is emitted as a missing obligation that ASP then rejects.
+- **Numerical evidence ≠ formal proof**: residual thresholds and entropy scores are search heuristics and screening gates only. They never promote a conjecture to a theorem.
+- **Provenance**: numerically pruned candidates remain recorded in an append-only SHA-256 ledger (status = pruned).
+- **Self-adjointness lock**: the Lean development encodes the principle that denying the critical-line conclusion requires denying either the existence of adeles, the axioms of functional analysis, or the definition of self-adjointness.
+- **Legacy of the Universal Object**: see `docs/zeta_cyberpunk_ascii.txt` for the spectral manifest.
 
-## Status
+## Requirements
 
-Research prototype. The Lean formalization contains `sorry`s where the full Connes trace formula and certain spectral theorems remain to be discharged against Mathlib. The ASP, numerical, and ontology layers are functional.
+- gfortran and a C compiler with C23 (`-std=c2x`), CMake ≥ 3.21
+- SWI-Prolog (with `semweb`) for the Prolog ports and their tests
+- elan for Lean; Lake fetches Mathlib
+- Clingo for the ASP programs, Futhark for the GPU kernels
 
 ## License
 
-AGPLv3 — see [LICENSE](LICENSE).
+Dual-licensed: AGPL-3.0 ([LICENSE](LICENSE)) or SnapKitty Opaque 1.0. New source files carry `SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-SnapKitty-Opaque-1.0`. `include/ro_ziggurat_tables.h` contains NumPy's ziggurat tables (BSD-3-Clause).
 
 ## References
 
