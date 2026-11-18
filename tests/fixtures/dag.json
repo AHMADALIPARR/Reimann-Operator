@@ -1,0 +1,168 @@
+[
+ {
+  "record": {
+   "hypothesis_id": "H0",
+   "parent_hypothesis_ids": [],
+   "mathematical_statement": "Spectrum of D is real",
+   "assumptions": [
+    "A1"
+   ],
+   "claimed_derivation": "\u03bb = s \u2212 1/2 \u21d2 Re(s) = 1/2 \"quoted\"\n",
+   "spectral_evidence": {
+    "zero_1": 14.134725141734695,
+    "a": 1
+   },
+   "entropy_score": 0.5,
+   "counterexample_search_result": "",
+   "formal_verification_status": "UNRESOLVED_CONJECTURE"
+  },
+  "depth": 0
+ },
+ {
+  "record": {
+   "hypothesis_id": "H1",
+   "parent_hypothesis_ids": [
+    "H0"
+   ],
+   "mathematical_statement": "  D is   SELF-adjoint ",
+   "assumptions": [
+    "A1"
+   ],
+   "claimed_derivation": "\u03bb = s \u2212 1/2 \u21d2 Re(s) = 1/2 \"quoted\"\n",
+   "spectral_evidence": {
+    "zero_1": 14.134725141734695,
+    "a": 1
+   },
+   "entropy_score": 0.5,
+   "counterexample_search_result": "no counterexample found",
+   "formal_verification_status": "VERIFIED_LEMMA"
+  },
+  "depth": 1
+ },
+ {
+  "record": {
+   "hypothesis_id": "H1b",
+   "parent_hypothesis_ids": [
+    "H0"
+   ],
+   "mathematical_statement": "d is self-adjoint",
+   "assumptions": [
+    "A1"
+   ],
+   "claimed_derivation": "\u03bb = s \u2212 1/2 \u21d2 Re(s) = 1/2 \"quoted\"\n",
+   "spectral_evidence": {
+    "zero_1": 14.134725141734695,
+    "a": 1
+   },
+   "entropy_score": 0.5,
+   "counterexample_search_result": "",
+   "formal_verification_status": "UNRESOLVED_CONJECTURE"
+  },
+  "depth": 1
+ },
+ {
+  "record": {
+   "hypothesis_id": "H5",
+   "parent_hypothesis_ids": [
+    "NOPE"
+   ],
+   "mathematical_statement": "orphan",
+   "assumptions": [
+    "A1"
+   ],
+   "claimed_derivation": "\u03bb = s \u2212 1/2 \u21d2 Re(s) = 1/2 \"quoted\"\n",
+   "spectral_evidence": {
+    "zero_1": 14.134725141734695,
+    "a": 1
+   },
+   "entropy_score": 0.5,
+   "counterexample_search_result": "",
+   "formal_verification_status": "UNRESOLVED_CONJECTURE"
+  },
+  "depth": 1
+ },
+ {
+  "record": {
+   "hypothesis_id": "H2",
+   "parent_hypothesis_ids": [
+    "H0",
+    "H1"
+   ],
+   "mathematical_statement": "Trace formula holds",
+   "assumptions": [
+    "A1"
+   ],
+   "claimed_derivation": "\u03bb = s \u2212 1/2 \u21d2 Re(s) = 1/2 \"quoted\"\n",
+   "spectral_evidence": {
+    "zero_1": 14.134725141734695,
+    "a": 1
+   },
+   "entropy_score": 1,
+   "counterexample_search_result": "searched 1e6 points",
+   "formal_verification_status": "NUMERICALLY_SUPPORTED"
+  },
+  "depth": 2
+ },
+ {
+  "record": {
+   "hypothesis_id": "H6",
+   "parent_hypothesis_ids": [
+    "H0"
+   ],
+   "mathematical_statement": "too deep",
+   "assumptions": [
+    "A1"
+   ],
+   "claimed_derivation": "\u03bb = s \u2212 1/2 \u21d2 Re(s) = 1/2 \"quoted\"\n",
+   "spectral_evidence": {
+    "zero_1": 14.134725141734695,
+    "a": 1
+   },
+   "entropy_score": 0.5,
+   "counterexample_search_result": "",
+   "formal_verification_status": "UNRESOLVED_CONJECTURE"
+  },
+  "depth": 5
+ },
+ {
+  "record": {
+   "hypothesis_id": "H0",
+   "parent_hypothesis_ids": [],
+   "mathematical_statement": "Spectrum of D is real, restated",
+   "assumptions": [
+    "A1"
+   ],
+   "claimed_derivation": "\u03bb = s \u2212 1/2 \u21d2 Re(s) = 1/2 \"quoted\"\n",
+   "spectral_evidence": {
+    "zero_1": 14.134725141734695,
+    "a": 1
+   },
+   "entropy_score": 0.5,
+   "counterexample_search_result": "",
+   "formal_verification_status": "UNRESOLVED_CONJECTURE"
+  },
+  "depth": 0
+ },
+ {
+  "record": {
+   "hypothesis_id": "H4",
+   "parent_hypothesis_ids": [
+    "H2"
+   ],
+   "mathematical_statement": "zeros simple",
+   "assumptions": [
+    "A1"
+   ],
+   "claimed_derivation": "\u03bb = s \u2212 1/2 \u21d2 Re(s) = 1/2 \"quoted\"\n",
+   "spectral_evidence": {
+    "zero_1": 14.134725141734695,
+    "a": 1
+   },
+   "entropy_score": 0.5,
+   "counterexample_search_result": "none",
+   "formal_verification_status": "VERIFIED_LEMMA",
+   "provenance_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  },
+  "depth": 3
+ }
+]

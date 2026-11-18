@@ -1,0 +1,64 @@
+[
+ {
+  "candidate_id": 3,
+  "parent_id": 0,
+  "generation": 1,
+  "zero_real": 0.5,
+  "zero_imag": 14.134725141734695,
+  "eigenvalue_real": 14.134725141734695,
+  "entropy": 0.69,
+  "residual": 2.7e-11,
+  "status": 1,
+  "novelty": 0.3,
+  "obligation_progress": 0.25
+ },
+ {
+  "candidate_id": 1,
+  "parent_id": 0,
+  "generation": 0,
+  "zero_real": 0.5,
+  "zero_imag": 21.02203963877155,
+  "eigenvalue_real": 21.0,
+  "entropy": 1.1,
+  "residual": 0.001,
+  "status": 1,
+  "novelty": 0.1,
+  "obligation_progress": 0.5
+ },
+ {
+  "candidate_id": 2,
+  "parent_id": 1,
+  "generation": 1,
+  "zero_real": 0.51,
+  "zero_imag": 25.0,
+  "eigenvalue_real": 24.9,
+  "entropy": 0.2,
+  "residual": 0.4,
+  "status": 2
+ },
+ {
+  "candidate_id": 7,
+  "parent_id": 2,
+  "generation": 2,
+  "zero_real": 0,
+  "zero_imag": 30,
+  "eigenvalue_real": -1.5e-07,
+  "entropy": 1e+22,
+  "residual": 1e-05,
+  "status": -1,
+  "info_gain": 0.5
+ },
+ {
+  "candidate_id": 5,
+  "parent_id": 1,
+  "generation": 1,
+  "zero_real": 0.5,
+  "zero_imag": 32.9,
+  "eigenvalue_real": 32.9,
+  "entropy": 0.69,
+  "residual": 2.7e-11,
+  "status": 1,
+  "novelty": 0.3,
+  "obligation_progress": 0.25
+ }
+]
