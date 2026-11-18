@@ -25,7 +25,7 @@
     citecolor=primary,
     urlcolor=primary,
     pdftitle={SOVEREIGN-RH-LOCK: A Hybrid Neuro-Symbolic and Formal Verification Architecture for the Connes-Berry-Keating Spectral Program},
-    pdfauthor={SOVEREIGN-RH-LOCK Research Engine}
+    pdfauthor={Ahmad Ali Parr, Jessica Westerhoff, SnapKitty Collective Research Team}
 }
 
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
@@ -48,7 +48,7 @@
 \emergencystretch=3em
 
 \title{\textbf{SOVEREIGN-RH-LOCK: A Hybrid Neuro-Symbolic and Formal Verification Architecture for the Connes--Berry--Keating Spectral Program}}
-\author{SOVEREIGN-RH-LOCK Research Engine}
+\author{Ahmad Ali Parr\\ Jessica Westerhoff\\ SnapKitty Collective Research Team}
 \date{November 2026}
 
 \begin{document}
@@ -208,244 +208,49 @@ Table~\ref{tab:ports} lists the Python sources and their ports. The Python files
 \toprule
 \textbf{Python} & \textbf{Port} \\
 \midrule
-\code{torch/spectral.py} & \code{kernels/ro\_kernels.f90} (eigenvalues, $\zeta$, zeros, sums); \code{src/ro\_main.c}; \code{src/ro\_numpy\_rng.c} \\
-\code{torch/entropy.py} & \code{ro\_shannon}, \code{ro\_vn\_entropy} (Fortran); \code{shannon}, \code{vn-entropy}, \code{entropy-bounds} (C23) \\
-\code{torch/candidates.py} & \code{ro\_priority} (Fortran); \code{rank}, \code{ledger}, \code{pack}, \code{unpack} (C23); \code{src/ro\_sha256.c} \\
-\code{dspy/research\_engine.py} & \code{provider}, \code{temp}, \code{lm-config}, \code{provenance}, \code{dag} (C23) \\
-\code{dspy/candidate\_optimizer.py} & \code{metric}, \code{select} (C23) \\
-\code{dspy/signatures.py} & \code{dspy/signatures.pl} (SWI-Prolog) \\
-\code{owl/ontology\_bridge.py} & \code{owl/ontology\_bridge.pl} (SWI-Prolog~\cite{swipl2012}) \\
+\code{torch/spectral.py} & \code{kernels/ro\_kernels.f90} (eigenvalues, zeta, zeros, sums), \code{src/ro\_main.c} (\texttt{herm-res}, \texttt{eigvalsh}, \texttt{bk}, \texttt{zeta-res}, \texttt{zetazero}, \texttt{spacing}, \texttt{perturb}), \code{src/ro\_numpy\_rng.c} & Fortran, C23 \\
+\code{torch/entropy.py} & \code{kernels/ro\_kernels.f90} (\texttt{ro\_shannon}, \texttt{ro\_vn\_entropy}), \code{src/ro\_main.c} (\texttt{shannon}, \texttt{vn-entropy}, \texttt{entropy-bounds}) & Fortran, C23 \\
+\code{torch/candidates.py} & \code{kernels/ro\_kernels.f90} (\texttt{ro\_priority}), \code{src/ro\_main.c} (\texttt{rank}, \texttt{ledger}, \texttt{pack}, \texttt{unpack}), \code{src/ro\_sha256.c} & Fortran, C23 \\
+\code{dspy/research\_engine.py} & \code{src/ro\_main.c} (\texttt{provider}, \texttt{temp}, \texttt{lm-config}, \texttt{provenance}, \texttt{dag}) & C23 \\
+\code{dspy/candidate\_optimizer.py} & \code{src/ro\_main.c} (\texttt{metric}, \texttt{select}) & C23 \\
+\code{dspy/signatures.py} & \code{dspy/signatures.pl} & SWI-Prolog \\
+\code{owl/ontology\_bridge.py} & \code{owl/ontology\_bridge.pl} & SWI-Prolog \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\section{Numerical Kernels}
-\label{sec:kernels}
+The Python files stay in the tree. \code{tests/golden/} holds what the Python printed for every test case. CI runs only the ports and compares their output with those files, byte for byte except where an eigen-solver or a BLAS dot product sets the last bits; those cases carry a tolerance in \code{tests/cases.txt}.
 
-\subsection{Zeta in quad precision}
-$\zeta(s)$ is evaluated by Euler--Maclaurin summation in Fortran \code{REAL(16)} (IEEE binary128, 113-bit significand):
-\begin{equation}
-\zeta(s) = \sum_{n=1}^{N-1} n^{-s} + \frac{N^{1-s}}{s-1} + \frac{N^{-s}}{2} + \sum_{k=1}^{M} \frac{B_{2k}}{(2k)!}\, s(s+1)\cdots(s+2k-2)\, N^{-s-2k+1} + R_{N,M},
-\end{equation}
-with $N = \lfloor |s| \rfloor + 30$ and $M = 36$; the Bernoulli numbers are generated once in \code{REAL(16)} from the recurrence for $B_n/n!$. A double-precision variant ($N = \lfloor |s|/2\rfloor + 12$, $M=12$) is used only to locate sign changes.
-
-\subsection{Hardy's function and the zero finder}
-The Riemann--Siegel theta function $\theta(t) = \operatorname{Im}\log\Gamma(\tfrac14 + \tfrac{it}{2}) - \tfrac{t}{2}\log\pi$ is computed in \code{REAL(16)} by Stirling's series after shifting the argument by 24, and Hardy's function is $Z(t) = e^{i\theta(t)}\zeta(\tfrac12+it)$, real for real $t$~\cite{edwards1974,titchmarsh1986}. Zeros are found by scanning $Z$ in double precision from $t=10$ with step $0.02$ and refining every sign change in \code{REAL(16)} by the Illinois variant of regula falsi (the retained endpoint's value is halved when the same side is kept twice), stopping when the bracket is below $10^{-31}$ relative. The $k$-th zero is the $k$-th sign change, so the routine also counts zeros; a missed pair of close zeros would show up as an index mismatch against the oracle.
-
-\subsection{Eigenvalues, entropy and sums}
-Hermitian eigenvalues are computed by cyclic Jacobi rotations on the real symmetric $2n\times 2n$ embedding $\begin{psmallmatrix}\operatorname{Re}A & -\operatorname{Im}A\\ \operatorname{Im}A & \operatorname{Re}A\end{psmallmatrix}$, whose eigenvalues are those of $A$, each twice. Shannon entropy $H(p)$ and von Neumann entropy $S(\rho)=-\sum_i \lambda_i\log\lambda_i$ are computed after the same Hermiticity, unit-trace and positivity checks as the Python original; they are never mixed with the zeta residual $r(s)$.
-
-\section{Oracle Verification}
+\section{Oracle}
 \label{sec:oracle}
 
-\code{data/zeta\_zeros\_oracle.txt} tabulates the imaginary parts of the first 511 nontrivial zeros to ten decimals. \code{ro oracle-check} recomputes every zero with the kernel of Section~\ref{sec:kernels} and requires agreement to the oracle's rounding. The measured result is:
-\begin{center}
-\begin{tabular}{lr}
-\toprule
-zeros checked & 511 \\
-index or value mismatches & 0 \\
-maximum $|t_k^{\mathrm{computed}} - t_k^{\mathrm{oracle}}|$ & $4.99\times 10^{-11}$ \\
-maximum $|\zeta(\tfrac12 + it)|$ at the \code{REAL(16)} roots & $1.94\times10^{-28}$ \\
-maximum $|\zeta(\tfrac12 + it)|$ at the tabulated (rounded) values & $3.78\times10^{-10}$ \\
-wall time (one core) & 16.2 s \\
-\bottomrule
-\end{tabular}
-\end{center}
-The deviation is below the oracle's half-unit rounding of $5\times10^{-11}$, and the residual at the tabulated values is of the size expected from that rounding times $|\zeta'|$. The check runs in CI on every push. Independently, the original Python reference, rerun on the benchmark machine with \texttt{mpmath}~1.4.1 at 50 digits, verifies $\rho_1,\dots,\rho_5$ with maximum residual $|\zeta(\rho_k)| = 2.387\times10^{-50}$, and gives $|\zeta(0.6 + i\gamma_1)| = 0.0762$ at an off-line test point, confirming the threshold $|\zeta(0.6+i\gamma_1)|>0.05$ of the grounding draft.
+\code{data/zeta\_zeros\_oracle.txt} lists \code{index imaginary-part} for the first 511 non-trivial zeros, to 10 decimals (the first row carries no index and is read as zero 1). \code{ro oracle-check} recomputes every zero with the Fortran kernel and requires agreement to the oracle's rounding. It also reports $|\zeta(1/2 + it)|$ at each oracle value. The maximum deviation is $4.99\times10^{-11}$.
 
-\begin{figure}[!htbp]
-\centering
-\begin{tikzpicture}
-\begin{axis}[width=\linewidth, height=6cm, xmin=0, xmax=850, ymin=0, ymax=550,
-  xlabel={$T$}, ylabel={$N(T)$}, legend pos=north west, legend style={font=\small},
-  tick label style={font=\small}, label style={font=\small}]
-\input{figures/zeros_count.tex}
-\legend{oracle zeros, $\frac{T}{2\pi}\log\frac{T}{2\pi e} + \frac78$}
-\end{axis}
-\end{tikzpicture}
-\caption{The zero-counting function of the 511 oracle zeros, all at $\sigma=\frac12$, against the Riemann--von Mangoldt main term (\code{docs/images/zeros\_critical\_line.svg} also shows the zeros in the critical strip).}
-\label{fig:zeros}
-\end{figure}
-
-\section{Spacing Statistics}
+\section{Berry--Keating and GUE statistics}
 \label{sec:gue}
 
-Montgomery's pair-correlation theorem and conjecture~\cite{montgomery1973}, and Odlyzko's computations~\cite{odlyzko1987}, connect the local statistics of the zeros to the Gaussian Unitary Ensemble (GUE). We unfold the oracle zeros with the Riemann--von Mangoldt main term $x(t) = \frac{t}{2\pi}\log\frac{t}{2\pi e} + \frac78$ and normalise the 510 nearest-neighbour spacings by their mean.
+The unfolded nearest-neighbour spacings of the 511 oracle zeros have mean $1.0007$ and follow the GUE Wigner surmise, not the Poisson law (Montgomery--Odlyzko). The discrete Berry--Keating spectra do not.
 
-\begin{figure}[!htbp]
-\centering
-\begin{tikzpicture}
-\begin{axis}[width=\linewidth, height=6cm, xmin=0, xmax=3, ymin=0, ymax=1.2,
-  xlabel={normalised spacing $s$}, ylabel={density $p(s)$}, legend style={font=\small},
-  tick label style={font=\small}, label style={font=\small}]
-\input{figures/spacing_hist.tex}
-\addplot[domain=0:3, samples=150, thick, red!70!black] {32/pi^2*x^2*exp(-4*x^2/pi)};
-\addplot[domain=0:3, samples=100, densely dashed, gray] {exp(-x)};
-\legend{oracle zeros, GUE surmise, Poisson}
-\end{axis}
-\end{tikzpicture}
-\caption{Unfolded nearest-neighbour spacings of the oracle zeros (bin width $0.15$) against the GUE Wigner surmise $p(s)=\frac{32}{\pi^2}s^2e^{-4s^2/\pi}$ and the Poisson law $e^{-s}$.}
-\label{fig:gue}
-\end{figure}
-
-The measured statistics are: mean spacing $1.0007$ before normalisation, standard deviation of the normalised spacings $0.374$ (the GUE surmise has $\sqrt{3\pi/8-1}\approx0.422$, Poisson has $1$), smallest spacing $0.236$, and 3 of 510 spacings below $0.25$. The level repulsion at small $s$ is the qualitative GUE signature; the narrower distribution at these low heights is consistent with Odlyzko's observation that agreement with GUE improves with height~\cite{odlyzko1987}. The discrete Berry--Keating spectra of Section~\ref{sec:bk}, by contrast, have near-constant spacing and no fluctuation at all.
-
-\section{Candidates, Entropy and Provenance}
-\label{sec:candidates}
-
-A candidate $C$ carries an entropy $I$, a novelty $N$, an obligation progress $D$ and a residual $R$, and is scored by the heuristic search objective
-\begin{equation}
-J(C) = w_1 I + w_2 N + w_3 D - w_4 R, \qquad (w_1,w_2,w_3,w_4) = (1.0,\,0.5,\,2.0,\,1.5).
-\end{equation}
-Ranking sorts by $J$ and then by candidate id, so ties are deterministic. $J$ decides only what to explore next; it never changes an epistemic state. Every candidate, including pruned ones, is appended to a ledger whose entries are the SHA-256 of the compact, key-sorted JSON of the previous hash, the candidate fields and a note, starting from 64 zeros. Arrays of candidates are exchanged in the Klong Structure-of-Arrays format: a 32-byte header \code{"SRHLK64\textbackslash0"}, version, $N$ and column count, followed by nine columns of $N$ little-endian 8-byte values, $32+72N$ bytes in total.
-
-The research engine accepts a model only from a known provider and rejects, rather than clamps, an unsupported temperature. Its provenance DAG is finite by construction: depth at most 4, branching at most 3, at most 64 candidates, with duplicate statements removed after canonicalisation. The ASP layer encodes five mutually distinct epistemic states (candidate, numerically supported hypothesis, formally verified lemma, refuted hypothesis, unresolved conjecture) and the hard constraint that numerical evidence alone can never make a candidate formally admissible; the programs are written for clingo~\cite{clingo2019}.
-
-\section{The Formal Layer in Lean 4}
+\section{Lean formalisation}
 \label{sec:lean}
 
-The formal layer is a Lake project (\code{lean-checked/}) on Lean~4~\cite{lean4} v4.34.0-rc1 and Mathlib~\cite{mathlib2020} v4.34.0-rc1. The original operator file \code{lean/RiemannDiracOperator.lean} is kept unchanged; \code{RiemannDiracOperator\_checked.lean} is the compiling version.
-
-\subsection{The operator structure and the conditional theorem}
-
-\begin{definition}
-A nontrivial zero is $s\in\mathbb{C}$ with \code{riemannZeta s = 0} and $0<\operatorname{Re}s<1$, where \code{riemannZeta} is Mathlib's analytically continued zeta function.
-\end{definition}
-
-\begin{definition}
-For a complex inner product space $H$, a \code{RiemannDiracOperator H} consists of a continuous linear operator $D$, a proof that $\langle Du,v\rangle=\langle u,Dv\rangle$ for all $u,v$, and a proof of the spectral correspondence: $s$ is a nontrivial zero if and only if $s=\frac12+i\mu$ for an eigenvalue $\mu$ of $D$.
-\end{definition}
-
-\begin{theorem}[\code{critical\_line\_of\_dirac\_operator}]
-For every $H$, every $D$ of type \code{RiemannDiracOperator H} and every nontrivial zero $s$, $\operatorname{Re}s=\frac12$.
-\end{theorem}
-
-The proof uses Mathlib's \code{IsSymmetric.conj\_eigenvalue\_eq\_self} to show that eigenvalues of a symmetric operator are real, and then computes $\operatorname{Re}(\frac12+i\mu)=\frac12$. The theorem is an implication. It does not assert that a \code{RiemannDiracOperator} exists, and constructing one would discharge \texttt{OBL-01} through \texttt{OBL-08} at once. The bounded-operator modelling also departs from the unbounded setting of Section~\ref{sec:bk}: the obligations about domains (\texttt{OBL-02}, \texttt{OBL-04}) have no counterpart in this structure.
-
-\subsection{Recursive lemma generation}
-
-\code{gen\_dirac\_lemmas N} is a command elaborator that recurses on $k=N,N-1,\dots,0$ and, after elaborating level $k-1$, emits four theorems for level $k$: \code{pow\_k\_selfAdjoint} ($D^k$ is self-adjoint, proved from level $k-1$ and the self-adjointness of $D$), \code{pow\_k\_eigenvalue\_real}, \code{pow\_k\_inner\_real} ($\langle D^kv,v\rangle$ is real), and \code{trunc\_k\_nullspace} (a rank-one truncation on $\mathbb{R}^k$ annihilates vectors orthogonal to its right factor). The instance \code{gen\_dirac\_lemmas 16} produces 68 theorems. The closed form \code{selfAdjointRel\_pow}, proved for all $n$ by induction, sits beside them; the generated family is its unfolding to concrete exponents.
-
-\subsection{Axioms}
-CI runs \code{\#print axioms} on the main theorems and on the top generated level and fails if \code{sorryAx} appears, and a source scan rejects \code{sorry} and \code{admit}. The measured output is: \code{critical\_line\_of\_dirac\_operator}, \code{all\_nontrivial\_zeros\_on\_line}, \code{selfAdjointRel\_pow} and the four level-16 theorems depend on \code{propext}, \code{Classical.choice} and \code{Quot.sound} only, Lean's standard classical axioms.
-
-\subsection{Lemmas taken from riemann-gas}
-The repository \code{AHMADALIPARR/riemann-gas} at commit \code{be609fa} was mined for lemmas that compile against the same Mathlib; each was taken byte for byte with its source noted.
-\begin{itemize}
-  \item \code{ZetaTruncationProof.lean} compiles whole after moving its import from the nonexistent \code{Mathlib.Basic.Real.Basic} to \code{Mathlib.Data.Real.Basic}: \code{alloy\_red2\_discontinuity} and \code{second\_connector\_fails\_reachability} use no axioms, \code{outer\_product\_nullspace} uses the three standard ones, and the generator reuses it for \code{trunc\_k\_nullspace}.
-  \item From \code{DMZ\_F2\_Decomposition.lean}: \code{WeilBound}, \code{weil\_bound\_exists} (no axioms) and \code{weil\_bound\_genus\_two} (by \code{native\_decide}, hence the compiler-trust axiom \code{weil\_bound\_genus\_two.\_native.native\_decide.ax\_1\_1}).
-\end{itemize}
-The rest of \code{DMZ\_F2\_Decomposition.lean} does not compile, including against the Mathlib revision pinned by its own source project: the import \code{Mathlib.Algebra.BigOperators.Group.Finset} does not exist, and with that path corrected the definitions returning \code{Type*} raise universe errors, \code{MumfordPair.zero} leaves unsolved goals, the operator lemmas on \code{QuantumSpace} (defined locally in the file) fail on missing instances and extensionality, and \code{weil\_bound\_genus\_one} states \code{WeilBound 1 = 7}, which \code{native\_decide} refutes ($\text{WeilBound}(1)=5$). \code{Red2Functor.lean} fails on the unknown constant \code{ZMod.sq\_eq\_self} and a missing \code{HPow}~$\mathbb{C}$~$\mathbb{C}$ instance.
-
-\subsection{Proof-obligation gates in core Lean}
-\label{sec:lean-gates}
-\code{lean/SovereignRHLock.lean} formalises the audit layer itself using only Lean's core library. It defines the five epistemic states, an obligation status (open, partial, discharged), a ledger with one status per obligation \texttt{OBL-01} to \texttt{OBL-BRIDGE-01}, and the gates as Boolean functions: Gate~9 closes iff \texttt{OBL-04} to \texttt{OBL-07} are discharged, and Gate~10 (RH admission) additionally requires \texttt{OBL-08}. Its seven theorems state that an open Gate~9 blocks Gate~10; that an open \texttt{OBL-06} blocks RH admission; that numerical support and a formally verified lemma are distinct states; that a candidate with a missing obligation is neither retained nor admissible (mirroring \code{proof\_admission.lp}); and three arithmetic facts used by the system: $a<b \Rightarrow \neg(b\le a)$ on $\mathbb{N}$ (named the block-encoding boundedness obstruction), the Klong ABI length $32+9\cdot8n = 32+72n$, and the strict decrease of the remaining search budget. The file compiles unchanged and is built by \code{lean-checked}. Measured axioms: three theorems use none, two use \code{propext}, and the three \code{omega} proofs use \code{propext} and \code{Quot.sound}; CI fails on any other axiom.
-
-\section{Quantum Approach}
-\label{sec:quantum}
-
-The quantum track expresses finite truncations of the operator as block encodings in OpenQASM~3.0, on 4 data qubits ($N=16$) and one ancilla.
-\begin{itemize}
-  \item \code{openqasm/circulant\_qft\_bk.qasm} targets $U_A = (I\otimes F_N^\dagger)\,U_D\,(I\otimes F_N)$, a circulant block encoding meant for the periodic central-difference Berry--Keating stencil of Section~\ref{sec:bk}: a 4-qubit QFT, a diagonal stage of controlled phases with angles $0.25, 0.5, 1, 2$ sandwiched between ancilla Hadamards, and the inverse QFT. Expanded, it applies 10 \code{h}, 20 \code{cp}, 4 \code{swap} and 2 \code{x} gates before measurement.
-  \item \code{openqasm/periodic\_diagonal\_lcu.qasm} encodes $D_{\cos}|j\rangle = \cos(\omega j+\phi)|j\rangle$ with $\omega=0.37$, $\phi=0.5$ as a one-ancilla linear combination of $V_{\omega,\phi}$ and $V_{\omega,\phi}^\dagger$, using 2 \code{h}, 2 \code{x}, 2 \code{p} and 8 \code{cp} gates.
-\end{itemize}
-Both circuits parse without syntax errors under the OpenQASM~3 reference ANTLR grammar (28 and 23 top-level statements). We have not simulated them, so we make no claim here about which matrix each one encodes or about the subnormalisation $\alpha$. Because a block encoding requires $\|A_N\|_2\le\alpha$ and $\|A_N\|_2 = n/\ln(b/a)$ by~\eqref{eq:bkspec}, the subnormalisation grows linearly in $n$: block encodings address finite truncations only, which is the content of the boundedness lemma in Section~\ref{sec:lean-gates}.
-
-\section{Verification Gates and Validation}
-\label{sec:gates}
-
-\textsc{Sovereign-RH-Lock} enforces ten sequential verification gates. In this repository they are realised by continuous integration on every push:
-\begin{itemize}
-  \item \textbf{Native suite (ctest):} 72 tests: 58 golden cases for the Fortran/C23 ports, 13 for the Prolog ports, and the 511-zero oracle check (Section~\ref{sec:oracle}). They cover provider temperature rejection, bounded DAG deduplication, Klong binary round trips, entropy input validation, the ledger and the OWL-to-ASP emission.
-  \item \textbf{High-precision spectral check:} the oracle check and the Python reference values of Section~\ref{sec:oracle}; discrete $H_{\mathrm{BK}}$ Hermiticity residual $0.0$; Weyl stability satisfied at $\epsilon=10^{-6}$.
-  \item \textbf{Formal build:} \code{lake build} of \code{lean-checked}, the axiom checks of Section~\ref{sec:lean}, and the \code{sorry}/\code{admit} scan.
-  \item \textbf{Proof audit:} \textbf{Gate~9} and \textbf{Gate~10} remain \textsc{Open}. \texttt{OBL-04} is \textsc{Partial} (self-adjointness holds for the finite discretisations and is an assumption of the Lean structure, not a theorem about an infinite-dimensional operator), and \texttt{OBL-05} to \texttt{OBL-08} and \texttt{OBL-BRIDGE-01} are \textsc{Open}.
-\end{itemize}
+The conditional critical-line argument is formalised in Lean 4 against Mathlib. Every non-trivial zero has $\operatorname{Re}(s) = 1/2$ for any given self-adjoint operator satisfying an exact spectral correspondence. No such operator is constructed. The proof-obligation gates in \code{lean/SovereignRHLock.lean} keep Gate 9 and Gate 10 explicitly open while completeness (OBL-06) is open.
 
 \section{Benchmarks}
 \label{sec:bench}
 
-Table~\ref{tab:bench} gives median wall times from hyperfine~1.19 (\code{-N}, 3 to 20 runs, with a warm-up run for everything under a minute) on an 8-vCPU Intel Xeon virtual machine running Linux~6.12. The ports were built in Release mode with gcc/gfortran~16.2.0 and SWI-Prolog~10.0.0; the originals ran on Python~3.13.5 with NumPy~2.5.5, \texttt{mpmath}~1.4.1 and rdflib~7.6.0.
-
-\begin{table}[!htbp]
-\centering
-\caption{Median wall time, native port vs.\ Python original.}
-\label{tab:bench}
-\begin{tabularx}{\linewidth}{lXrr}
-\toprule
-\textbf{Task} & \textbf{Input} & \textbf{Port} & \textbf{Python} \\
-\midrule
-First 511 zeros & \code{ro zeros 511} vs.\ reference loop, $k=1\dots511$ & 15.4 s & 85.5 s \\
-One zero & 100th zero, 30 digits & 2.88 s & 0.218 s \\
-Hermitian eigenvalues & BK matrix, $n=16$ & 1.4 ms & 99.9 ms \\
- & $n=64$ & 54.6 ms & 98.0 ms \\
- & $n=128$ & 726 ms & 114 ms \\
- & $n=256$ & 11.3 s & 137 ms \\
-Von Neumann entropy & $4\times4$ density matrix & 0.7 ms & 69.8 ms \\
-Shannon entropy & 10-vector & 0.9 ms & 66.2 ms \\
-Candidate ranking & 10\,000 candidates & 132 ms & 141 ms \\
-SHA-256 ledger & 10\,000 candidates & 264 ms & 247 ms \\
-Ontology check & \code{rh\_ontology.ttl}, 136 triples & 52.7 ms & 133 ms \\
-OWL $\to$ ASP facts & \code{rh\_ontology.ttl} & 43.4 ms & 68.9 ms \\
-\code{lake build} & \code{lean-checked}, own modules & 7.79 s & --- \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-Each run is a fresh process, so the Python column includes interpreter start-up and imports (a trivial input takes about 66 ms). The Jacobi solver has no dependencies and falls behind NumPy's LAPACK path past $n\approx100$. A single zero is computed in software \code{REAL(16)} after a scan from $t=10$, which is slower than \texttt{mpmath} at 30 digits; the full scan amortises that cost over all 511 zeros.
+Median wall times on an 8-vCPU Intel Xeon VM (Linux 6.12), Release builds with gcc/gfortran 16.2.0 and SWI-Prolog 10.0.0, originals on Python 3.13.5 with NumPy 2.5.5, mpmath 1.4.1 and rdflib 7.6.0. See the README for the full table.
 
 \section{Reproducibility}
 \label{sec:repro}
 
-All results in this paper come from the repository and can be regenerated with:
-\begin{verbatim}
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DRO_REQUIRE_PROLOG=ON
-cmake --build build -j1 && ctest --test-dir build --output-on-failure
-build/ro oracle-check data/zeta_zeros_oracle.txt
-cd lean-checked && lake exe cache get && lake build \
-  && lake env lean AxiomCheck.lean && lake env lean AxiomCheckSovereign.lean
-sh docs/plots/make_figures.sh build/ro      # SVG figures
-sh paper/figures/make_pgf.sh build/ro       # data for this paper's plots
-\end{verbatim}
-The figures in this paper are drawn by pgfplots from coordinate files written by \code{paper/figures/make\_pgf.sh} from \code{data/zeta\_zeros\_oracle.txt} and from \code{ro}; the SVG versions in \code{docs/images/} come from the same data. The Python goldens were produced once from the original sources and are stored as text; the OpenQASM files were checked with the reference grammar in \code{openqasm/openqasm} (\code{source/grammar}) and ANTLR~4.13.2. CI builds this paper on every push.
+Clone the repository, build the native engine with CMake, run ctest, and build the Lean project with lake. The paper itself is built with latexmk or tectonic from \code{paper/}.
 
 \section{Conclusion}
 
-\textsc{Sovereign-RH-Lock} turns the Connes--Berry--Keating program into a set of explicit, machine-checked boundaries. The native measurement layer reproduces its Python specification and the 511-zero oracle; the finite Berry--Keating operators are Hermitian but have an arithmetic spectrum given exactly by~\eqref{eq:bkspec}; the zeros themselves repel like GUE eigenvalues; and the Lean layer proves exactly what follows from a self-adjoint operator with the right spectrum, no more. Constructing that operator, the content of \texttt{OBL-01} to \texttt{OBL-08} and \texttt{OBL-BRIDGE-01}, remains open, and the system is built so that it stays recorded as open until it is not.
+\textsc{Sovereign-RH-Lock} records candidates, measures them, classifies them, and admits nothing as a theorem unless a proof assistant accepts it. The numerical evidence is finite and the formal statement is conditional. Gate 9 and Gate 10 remain open.
 
-\begin{thebibliography}{99}
-\bibitem{berry1999}
-M.~V. Berry and J.~P. Keating, ``The Riemann zeros and eigenvalue asymptotics,'' \emph{SIAM Review}, vol.~41, no.~2, pp.~236--266, 1999.
-
-\bibitem{connes1999}
-A.~Connes, ``Trace formula in noncommutative geometry and the zeros of the Riemann zeta function,'' \emph{Selecta Mathematica}, vol.~5, no.~1, pp.~29--106, 1999.
-
-\bibitem{riemann1859}
-B.~Riemann, ``Ueber die Anzahl der Primzahlen unter einer gegebenen Gr\"osse,'' \emph{Monatsberichte der K\"oniglich Preu{\ss}ischen Akademie der Wissenschaften zu Berlin}, pp.~671--680, November 1859.
-
-\bibitem{edwards1974}
-H.~M. Edwards, \emph{Riemann's Zeta Function}. New York: Academic Press, 1974.
-
-\bibitem{titchmarsh1986}
-E.~C. Titchmarsh, \emph{The Theory of the Riemann Zeta-Function}, 2nd ed., revised by D.~R. Heath-Brown. Oxford: Clarendon Press, 1986.
-
-\bibitem{montgomery1973}
-H.~L. Montgomery, ``The pair correlation of zeros of the zeta function,'' in \emph{Analytic Number Theory}, Proc.\ Sympos.\ Pure Math., vol.~24. Providence, RI: American Mathematical Society, 1973, pp.~181--193.
-
-\bibitem{odlyzko1987}
-A.~M. Odlyzko, ``On the distribution of spacings between zeros of the zeta function,'' \emph{Mathematics of Computation}, vol.~48, no.~177, pp.~273--308, 1987.
-
-\bibitem{lean4}
-L.~de~Moura and S.~Ullrich, ``The Lean 4 theorem prover and programming language,'' in \emph{Automated Deduction -- CADE 28}, LNCS vol.~12699. Cham: Springer, 2021, pp.~625--635.
-
-\bibitem{mathlib2020}
-The mathlib Community, ``The Lean mathematical library,'' in \emph{Proc.\ 9th ACM SIGPLAN Int.\ Conf.\ on Certified Programs and Proofs (CPP 2020)}. ACM, 2020, pp.~367--381.
-
-\bibitem{swipl2012}
-J.~Wielemaker, T.~Schrijvers, M.~Triska and T.~Lager, ``SWI-Prolog,'' \emph{Theory and Practice of Logic Programming}, vol.~12, no.~1--2, pp.~67--96, 2012.
-
-\bibitem{clingo2019}
-M.~Gebser, R.~Kaminski, B.~Kaufmann and T.~Schaub, ``Multi-shot ASP solving with clingo,'' \emph{Theory and Practice of Logic Programming}, vol.~19, no.~1, pp.~27--82, 2019.
-\end{thebibliography}
+\bibliography{references}
+\bibliographystyle{plain}
 
 \end{document}
