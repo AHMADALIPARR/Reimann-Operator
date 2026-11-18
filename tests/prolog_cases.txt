@@ -1,0 +1,14 @@
+# name script args...   (run from the repo root; golden output in tests/golden/prolog_golden.txt)
+summary_rh     owl/ontology_bridge.pl summary owl/rh_ontology.ttl
+validate_rh    owl/ontology_bridge.pl validate owl/rh_ontology.ttl
+facts_rh       owl/ontology_bridge.pl facts owl/rh_ontology.ttl
+factsc_rh      owl/ontology_bridge.pl facts owl/rh_ontology.ttl tests/fixtures/owl_candidates.json
+check_rh       owl/ontology_bridge.pl check owl/rh_ontology.ttl
+checks_rh      owl/ontology_bridge.pl check owl/rh_ontology.ttl --structural
+summary_bad    owl/ontology_bridge.pl summary tests/fixtures/bad_ontology.ttl
+validate_bad   owl/ontology_bridge.pl validate tests/fixtures/bad_ontology.ttl
+facts_bad      owl/ontology_bridge.pl facts tests/fixtures/bad_ontology.ttl
+factsc_bad     owl/ontology_bridge.pl facts tests/fixtures/bad_ontology.ttl tests/fixtures/owl_candidates.json
+check_bad      owl/ontology_bridge.pl check tests/fixtures/bad_ontology.ttl
+checks_bad     owl/ontology_bridge.pl check tests/fixtures/bad_ontology.ttl --structural
+signatures     dspy/signatures.pl
