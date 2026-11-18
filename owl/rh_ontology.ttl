@@ -1,0 +1,207 @@
+# Copyright (C) 2026 Ahmad Ali Parr / SnapKitty Research Lab
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+@prefix : <http://sovereign-rh-lock.org/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://sovereign-rh-lock.org/ontology> a owl:Ontology ;
+    rdfs:label "SOVEREIGN-RH-LOCK OWL 2 DL Ontology"@en ;
+    rdfs:comment "Structural ontology for Connes-Berry-Keating spectral operators, zeta zeros, proof obligations, and evidence classification under open-world semantics."@en ;
+    owl:versionInfo "0.1.0" .
+
+#################################################################
+# Classes (15 Required Classes)
+#################################################################
+
+:MathematicalObject a owl:Class ;
+    rdfs:label "MathematicalObject"@en .
+
+:HilbertSpace a owl:Class ;
+    rdfs:subClassOf :MathematicalObject ;
+    rdfs:label "HilbertSpace"@en .
+
+:Operator a owl:Class ;
+    rdfs:subClassOf :MathematicalObject ;
+    rdfs:label "Operator"@en .
+
+:DiracTypeOperator a owl:Class ;
+    rdfs:subClassOf :Operator ;
+    rdfs:label "DiracTypeOperator"@en .
+
+:SelfAdjointOperator a owl:Class ;
+    rdfs:subClassOf :Operator ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty :actsOnSpace ;
+        owl:someValuesFrom :HilbertSpace
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty :hasDomain ;
+        owl:someValuesFrom :MathematicalObject
+    ] ;
+    rdfs:label "SelfAdjointOperator"@en .
+
+:SpectralValue a owl:Class ;
+    rdfs:subClassOf :MathematicalObject ;
+    rdfs:label "SpectralValue"@en .
+
+:ZetaZero a owl:Class ;
+    rdfs:subClassOf :MathematicalObject ;
+    rdfs:label "ZetaZero"@en .
+
+:CriticalLineZero a owl:Class ;
+    rdfs:subClassOf :ZetaZero ;
+    rdfs:label "CriticalLineZero"@en .
+
+:SpectralCorrespondence a owl:Class ;
+    rdfs:subClassOf :MathematicalObject ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty :satisfiesObligation ;
+        owl:someValuesFrom :ProofObligation
+    ] ;
+    rdfs:label "SpectralCorrespondence"@en .
+
+:ProofObligation a owl:Class ;
+    rdfs:label "ProofObligation"@en .
+
+:VerifiedLemma a owl:Class ;
+    rdfs:label "VerifiedLemma"@en .
+
+:Conjecture a owl:Class ;
+    rdfs:label "Conjecture"@en .
+
+:Counterexample a owl:Class ;
+    rdfs:label "Counterexample"@en .
+
+:NumericalEvidence a owl:Class ;
+    rdfs:label "NumericalEvidence"@en .
+
+:FormalEvidence a owl:Class ;
+    rdfs:label "FormalEvidence"@en .
+
+#################################################################
+# Disjointness Axioms (Prevent Category Collapse)
+#################################################################
+
+:NumericalEvidence owl:disjointWith :FormalEvidence .
+:VerifiedLemma owl:disjointWith :Counterexample .
+:VerifiedLemma owl:disjointWith :Conjecture .
+:Conjecture owl:disjointWith :Counterexample .
+:HilbertSpace owl:disjointWith :Operator .
+:Operator owl:disjointWith :SpectralValue .
+:ZetaZero owl:disjointWith :ProofObligation .
+
+#################################################################
+# Object Properties (9 Required Relations)
+#################################################################
+
+:hasDomain a owl:ObjectProperty ;
+    rdfs:domain :Operator ;
+    rdfs:range :MathematicalObject ;
+    rdfs:label "hasDomain"@en .
+
+:actsOnSpace a owl:ObjectProperty ;
+    rdfs:domain :Operator ;
+    rdfs:range :HilbertSpace ;
+    rdfs:label "actsOnSpace"@en .
+
+:hasSpectrum a owl:ObjectProperty ;
+    rdfs:domain :Operator ;
+    rdfs:range :SpectralValue ;
+    rdfs:label "hasSpectrum"@en .
+
+:correspondsToZero a owl:ObjectProperty ;
+    rdfs:domain :SpectralValue ;
+    rdfs:range :ZetaZero ;
+    rdfs:label "correspondsToZero"@en .
+
+:dependsOnLemma a owl:ObjectProperty ;
+    rdfs:domain :MathematicalObject ;
+    rdfs:range :VerifiedLemma ;
+    rdfs:label "dependsOnLemma"@en .
+
+:satisfiesObligation a owl:ObjectProperty ;
+    rdfs:domain :MathematicalObject ;
+    rdfs:range :ProofObligation ;
+    rdfs:label "satisfiesObligation"@en .
+
+:supportedByEvidence a owl:ObjectProperty ;
+    rdfs:range [
+        a owl:Class ;
+        owl:unionOf ( :NumericalEvidence :FormalEvidence )
+    ] ;
+    rdfs:label "supportedByEvidence"@en .
+
+:contradictsClaim a owl:ObjectProperty ;
+    rdfs:domain :Counterexample ;
+    rdfs:label "contradictsClaim"@en .
+
+:derivedFromHypothesis a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:domain :Conjecture ;
+    rdfs:range :Conjecture ;
+    rdfs:label "derivedFromHypothesis"@en .
+
+#################################################################
+# Data Properties
+#################################################################
+
+:hasRealPart a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain :ZetaZero ;
+    rdfs:range xsd:double .
+
+:hasImagPart a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain :ZetaZero ;
+    rdfs:range xsd:double .
+
+:hasResidual a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain :NumericalEvidence ;
+    rdfs:range xsd:double .
+
+#################################################################
+# Canonical Research Individuals
+#################################################################
+
+:H_BK_Space a :HilbertSpace ;
+    rdfs:label "L2(R_+, dx)"@en .
+
+:D_BK_Domain a :MathematicalObject ;
+    rdfs:label "C_c^infinity((0, infinity))"@en .
+
+:H_BK_Operator a :DiracTypeOperator , :SelfAdjointOperator ;
+    :actsOnSpace :H_BK_Space ;
+    :hasDomain :D_BK_Domain ;
+    rdfs:label "Berry-Keating H_BK on L2(R_+)"@en .
+
+:H_Connes_Space a :HilbertSpace ;
+    rdfs:label "L2_delta(C_Q)"@en .
+
+:D_Connes_Operator a :DiracTypeOperator ;
+    :actsOnSpace :H_Connes_Space ;
+    rdfs:label "Connes Adelic Scaling Generator"@en .
+
+:OBL_04_SelfAdjointness a :ProofObligation .
+:OBL_05_TraceFormula a :ProofObligation .
+:OBL_06_Completeness a :ProofObligation .
+:OBL_07_Multiplicity a :ProofObligation .
+:OBL_08_CriticalLine a :ProofObligation .
+
+:Conjecture_BK_RH a :Conjecture ;
+    :satisfiesObligation :OBL_04_SelfAdjointness ;
+    rdfs:label "Unverified BK-RH Correspondence Conjecture"@en .
