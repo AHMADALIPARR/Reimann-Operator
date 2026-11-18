@@ -9,14 +9,14 @@ on:
 
 jobs:
   native:
-    name: Fortran kernels + C23 ports (golden + oracle)
+    name: Fortran kernels, C23 and Prolog ports (golden + oracle)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install gfortran
-        run: sudo apt-get update && sudo apt-get install -y gfortran
+      - name: Install gfortran and SWI-Prolog
+        run: sudo apt-get update && sudo apt-get install -y gfortran swi-prolog-nox
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DRO_REQUIRE_PROLOG=ON
       - name: Build
         run: cmake --build build -j1
       - name: ctest
