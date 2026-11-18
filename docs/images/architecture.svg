@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="350" viewBox="0 0 900 350" font-family="sans-serif" font-size="11">
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#555"/></marker></defs>
+<rect width="900" height="350" fill="#fff"/>
+<text x="450" y="22" text-anchor="middle" font-size="13">Reimann-Operator: data flow of the native engine and the Lean project</text>
+<path d="M210 66 C239.0 66 239.0 72 268 72" fill="none" stroke="#555" marker-end="url(#a)"/>
+<path d="M210 134 C239.0 134 239.0 128 268 128" fill="none" stroke="#555" marker-end="url(#a)"/>
+<path d="M210 218 C239.0 218 239.0 218 268 218" fill="none" stroke="#555" marker-end="url(#a)"/>
+<path d="M470 100 C504.0 100 504.0 100 538 100" fill="none" stroke="#555" marker-end="url(#a)"/>
+<text x="504.0" y="95" text-anchor="middle" font-size="9" fill="#555">ISO_C_BINDING</text>
+<path d="M470 218 C504.0 218 504.0 218 538 218" fill="none" stroke="#555" marker-end="url(#a)"/>
+<path d="M740 100 C764.0 100 764.0 120 788 120" fill="none" stroke="#555" marker-end="url(#a)"/>
+<path d="M740 218 C764.0 218 764.0 162 788 162" fill="none" stroke="#555" marker-end="url(#a)"/>
+<path d="M210 312 C239.0 312 239.0 312 268 312" fill="none" stroke="#555" marker-end="url(#a)"/>
+<path d="M470 312 C504.0 312 504.0 312 538 312" fill="none" stroke="#555" marker-end="url(#a)"/>
+<rect x="20" y="44" width="190" height="44" rx="6" fill="#f3f3f3" stroke="#888"/>
+<text x="115.0" y="63" text-anchor="middle" font-weight="bold">data/zeta_zeros_oracle.txt</text>
+<text x="115.0" y="77" text-anchor="middle" fill="#444">511 reference zeros</text>
+<rect x="20" y="112" width="190" height="44" rx="6" fill="#f3f3f3" stroke="#888"/>
+<text x="115.0" y="131" text-anchor="middle" font-weight="bold">JSON matrices, spectra,</text>
+<text x="115.0" y="145" text-anchor="middle" fill="#444">candidates, research records</text>
+<rect x="20" y="196" width="190" height="44" rx="6" fill="#f3f3f3" stroke="#888"/>
+<text x="115.0" y="215" text-anchor="middle" font-weight="bold">owl/rh_ontology.ttl</text>
+<text x="115.0" y="229" text-anchor="middle" fill="#444">OWL 2 DL in Turtle</text>
+<rect x="270" y="64" width="200" height="72" rx="6" fill="#e3ecfa" stroke="#1f4e9a"/>
+<text x="370.0" y="90" text-anchor="middle" font-weight="bold">ro (C23)</text>
+<text x="370.0" y="104" text-anchor="middle" fill="#444">CLI, json.dumps-exact JSON,</text>
+<text x="370.0" y="118" text-anchor="middle" fill="#444">SHA-256 ledger, PCG64 RNG</text>
+<rect x="540" y="54" width="200" height="92" rx="6" fill="#e6f4ea" stroke="#2e7d32"/>
+<text x="640.0" y="83" text-anchor="middle" font-weight="bold">ro_kernels.f90 (Fortran 2008)</text>
+<text x="640.0" y="97" text-anchor="middle" fill="#444">ζ(s), Hardy Z, zeros in REAL(16)</text>
+<text x="640.0" y="111" text-anchor="middle" fill="#444">Jacobi eigenvalues, entropy,</text>
+<text x="640.0" y="125" text-anchor="middle" fill="#444">priority scores</text>
+<rect x="270" y="190" width="200" height="56" rx="6" fill="#fdf1e2" stroke="#c06a00"/>
+<text x="370.0" y="215" text-anchor="middle" font-weight="bold">ontology_bridge.pl</text>
+<text x="370.0" y="229" text-anchor="middle" fill="#444">SWI-Prolog semweb + DCG</text>
+<rect x="540" y="190" width="200" height="56" rx="6" fill="#fdf1e2" stroke="#c06a00"/>
+<text x="640.0" y="215" text-anchor="middle" font-weight="bold">ASP facts</text>
+<text x="640.0" y="229" text-anchor="middle" fill="#444">for the Clingo programs in asp/</text>
+<rect x="790" y="112" width="96" height="58" rx="6" fill="#fbe9e9" stroke="#b33"/>
+<text x="838.0" y="138" text-anchor="middle" font-weight="bold">ctest</text>
+<text x="838.0" y="152" text-anchor="middle" fill="#444">golden + oracle</text>
+<rect x="20" y="290" width="190" height="44" rx="6" fill="#f1e8f8" stroke="#6a3d9a"/>
+<text x="115.0" y="309" text-anchor="middle" font-weight="bold">lean/RiemannDiracOperator.lean</text>
+<text x="115.0" y="323" text-anchor="middle" fill="#444">operator file</text>
+<rect x="270" y="290" width="200" height="44" rx="6" fill="#f1e8f8" stroke="#6a3d9a"/>
+<text x="370.0" y="309" text-anchor="middle" font-weight="bold">gen_dirac_lemmas 16</text>
+<text x="370.0" y="323" text-anchor="middle" fill="#444">68 lemmas over D^0 … D^16</text>
+<rect x="540" y="290" width="200" height="44" rx="6" fill="#f1e8f8" stroke="#6a3d9a"/>
+<text x="640.0" y="309" text-anchor="middle" font-weight="bold">lean-checked: lake build</text>
+<text x="640.0" y="323" text-anchor="middle" fill="#444">Mathlib, #print axioms</text>
+</svg>
