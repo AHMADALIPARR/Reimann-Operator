@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-SnapKitty-Opaque-1.0
+# Copyright (C) 2026 Ahmad Ali Parr / SnapKitty Research Lab
+# Test fixture: missing classes and relations, no NumericalEvidence/FormalEvidence disjointness,
+# and an individual typed into two disjoint classes through rdfs:subClassOf.
+@prefix : <http://example.org/bad#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:Operator a owl:Class .
+:HilbertSpace a owl:Class .
+:DiracTypeOperator a owl:Class ; rdfs:subClassOf :Operator .
+:HilbertSpace owl:disjointWith :Operator .
+:Conjecture a owl:Class .
+:VerifiedLemma a owl:Class .
+:Conjecture owl:disjointWith :VerifiedLemma .
+:hasDomain a owl:ObjectProperty .
+:weight a owl:DatatypeProperty .
+:Weird a :DiracTypeOperator , :HilbertSpace ;
+    rdfs:label "both v1.2" .
+:Claim_1 a :Conjecture, :VerifiedLemma .
+:Plain a :Conjecture .

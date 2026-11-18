@@ -1,0 +1,60 @@
+# Golden outputs of the Python sources, one case per line: <name> <output>. Generated on the box from the
+# repo's Python with NumPy 2.5.5, mpmath 1.4.1 and rdflib 7.6.0 (Python is not run in CI).
+bk_n6_t0 [[[0.0, 0.0], [0.0, -1.3028834457097553], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 1.3028834457097553]], [[0.0, 1.3028834457097553], [0.0, 0.0], [0.0, -1.3028834457097553], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 1.3028834457097553], [0.0, 0.0], [0.0, -1.3028834457097553], [0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0], [0.0, 1.3028834457097553], [0.0, 0.0], [0.0, -1.3028834457097553], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 1.3028834457097553], [0.0, 0.0], [0.0, -1.3028834457097553]], [[0.0, -1.3028834457097553], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 1.3028834457097553], [0.0, 0.0]]]
+bk_n8_t07 [[[0.0, 0.0], [0.0, -1.084340122727267], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.698551086042394, 0.8293490712270537]], [[0.0, 1.084340122727267], [0.0, 0.0], [0.0, -1.084340122727267], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 1.084340122727267], [0.0, 0.0], [0.0, -1.084340122727267], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0], [0.0, 1.084340122727267], [0.0, 0.0], [0.0, -1.084340122727267], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 1.084340122727267], [0.0, 0.0], [0.0, -1.084340122727267], [0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 1.084340122727267], [0.0, 0.0], [0.0, -1.084340122727267], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 1.084340122727267], [0.0, 0.0], [0.0, -1.084340122727267]], [[0.698551086042394, -0.8293490712270537], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 1.084340122727267], [0.0, 0.0]]]
+bk_n5_tneg [[[0.0, 0.0], [0.0, -2.275598066567093], [0.0, 0.0], [0.0, 0.0], [-2.159507565007481, 0.7175469582120417]], [[0.0, 2.275598066567093], [0.0, 0.0], [0.0, -2.275598066567093], [0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 2.275598066567093], [0.0, 0.0], [0.0, -2.275598066567093], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0], [0.0, 2.275598066567093], [0.0, 0.0], [0.0, -2.275598066567093]], [[-2.159507565007481, -0.7175469582120417], [0.0, 0.0], [0.0, 0.0], [0.0, 2.275598066567093], [0.0, 0.0]]]
+bk_err_n ValueError: Discretization size n must be >= 4
+bk_err_ab ValueError: Require 0 < a < b
+herm_res_herm5 0.0
+herm_res_nonherm3 6.363961030678928
+eig_herm5 [-3.115956737731766, -1.44769843562231, -0.17515884073994642, 1.055498155685901, 2.105632210184323]
+eig_real4 [0.3819660112501049, 1.3819660112501053, 2.618033988749895, 3.6180339887498953]
+eig_bk16 [-6.947490293006018, -6.468500353541076, -6.36878781451713, -5.004739872351226, -4.8204951244733145, -2.779053113675818, -2.5383257496255527, -0.13028071062247842, 0.1302807106224751, 2.538325749625556, 2.7790531136758205, 4.820495124473315, 5.0047398723512275, 6.368787814517131, 6.468500353541077, 6.947490293006017]
+zeta_res_oracle1 [2.7517741873775364e-11, 1e-45]
+zeta_res_off [2.6926970566644637, 1e-45]
+zeta_res_strip [1.162657714944256, 1e-35]
+zeta_res_right [1.4925521952216037, 1e-45]
+zetazero_1 {"index": 1.0, "real": 0.5, "imag": 14.134725141734695, "residual": 3.9537444742815647e-51, "dps": 50.0}
+zetazero_25 {"index": 25.0, "real": 0.5, "imag": 88.80911120763446, "residual": 1.7483744387353573e-49, "dps": 50.0}
+zetazero_100 {"index": 100.0, "real": 0.5, "imag": 236.5242296658162, "residual": 4.804002186747569e-29, "dps": 30.0}
+zetazero_err ValueError: Zero index k must be >= 1
+spacing_list {"count": 40.0, "mean_spacing": 0.10974578388271748, "std_spacing": 0.18034431065524054, "mean_ratio": 0.3934688254912257}
+spacing_short {"count": 2.0, "mean_spacing": 0.0, "std_spacing": 0.0, "mean_ratio": 0.0}
+spacing_dupes {"count": 4.0, "mean_spacing": 0.3333333333333333, "std_spacing": 0.4714045207910317, "mean_ratio": 0.0}
+spacing_big {"count": 300.0, "mean_spacing": 0.01935909025293788, "std_spacing": 0.05009760820459353, "mean_ratio": 0.39339219718927365}
+perturb_bk16 {"epsilon": 1e-06, "max_eigenvalue_shift": 2.9090278008681025e-07, "weyl_upper_bound": 1.0000000000000002e-06, "bound_satisfied": true}
+perturb_herm5_s7 {"epsilon": 0.0001, "max_eigenvalue_shift": 0.00010000000000198739, "weyl_upper_bound": 9.999999999999998e-05, "bound_satisfied": true}
+shannon_uniform 1.3862943611198906
+shannon_skew 1.8206441527234132
+shannon_rows [1.0114042647073518, 0.3250829733914482]
+shannon_neg ValueError: probabilities must be finite and non-negative
+shannon_zero ValueError: probabilities must sum to a positive value
+shannon_empty ValueError: probabilities array must be non-empty
+vn_valid4 0.7734931565065502
+vn_pure2 -0.0
+vn_mixed3 1.0397207708399179
+vn_nonherm2 ValueError: density_operator is not Hermitian (residual=2.828e-01)
+vn_badtrace2 ValueError: density_operator trace must be 1.0 (got 1.400000000000)
+vn_notpsd2 ValueError: density_operator is not positive semidefinite (min_eig=-2.000e-01)
+bounds_ok true
+bounds_hi false
+bounds_dim0 false
+bounds_nan false
+rank_cands [[7, 1e+22], [1, 2.1485000000000003], [3, 1.3399999999594998], [5, 1.3399999999594998], [2, -0.4000000000000001]]
+rank_cands_inf [[7, 1e+22], [1, 2.1485000000000003], [3, 1.3399999999594998], [5, 1.3399999999594998], [2, -Infinity]]
+ledger_cands {"hashes": ["1f0efbb7d1d8b9bf8f5cd3212ac0522bfaffc51f88a8c65faa1714a1f65431d1", "4bf307615c995f36a597cf41a291a5d1d7532ee98217a200a0765058d73524e6", "159f8f6befc30f0602e53cccaae303c37d52224f9086d4b611cdd294573ea3dc", "a1ea7b447568dab973060b8879344e684af76075c249755725fcce93c009cfcb", "5dc4a922d929255c07ec0390270e303d5b4e3bb8765a0ba63da6ae360a9a0b9a"], "verify_chain": true}
+ledger_cands_inf {"hashes": ["1f0efbb7d1d8b9bf8f5cd3212ac0522bfaffc51f88a8c65faa1714a1f65431d1", "4bf307615c995f36a597cf41a291a5d1d7532ee98217a200a0765058d73524e6", "71da6dbb0f890ccbe69480df257376ceec2e5515d591b01f70ff9039c506a19d", "af17cee7ed30739a73b4c889204f2f28816b4f0c9027f6209ddcd9b2b36b38df", "82afcd385acaf302557cb7d60a4a3c90676f663a802178d4e404c671bb96156e"], "verify_chain": true}
+provider_default "openai"
+provider_anthropic "anthropic"
+provider_bad ValueError: Unsupported or unknown provider 'acme' in model 'acme/model-x'. Supported providers: ['anthropic', 'gemini', 'local', 'mistral', 'openai', 'vertex_ai']
+temp_ok 1.5
+temp_hi ValueError: Requested temperature 1.2 exceeds max supported temperature 1.0 for provider 'anthropic'. Rejecting rather than silently substituting.
+temp_neg ValueError: Temperature must be >= 0.0, got -0.5
+temp_badprov ValueError: Unsupported or unknown provider 'foo' in model 'foo/bar'. Supported providers: ['anthropic', 'gemini', 'local', 'mistral', 'openai', 'vertex_ai']
+provenance_records ["12c9d140b9c78884fbc5b1066379ec056fea294371eec73b1b911dbbd267ddd1", "d817680ffdf5cde75927a7d2c483894b2ac8c72b8ef62ce93e9a1d0da3ffc077", "721233b286b30e7ebdaba026f60b11706b3d4146d8cd0a117b5aac7e6de7bf4e", "0b6c1a1d282c820c07cd99fb9b29d37911ccc4e6c6be3443d02b410a1fc2eefd", "7e19c60eb46f920fbd8ff85b04b9c454f4479a4c3e6d55a034026ae0485dae99", "715f781126a26a2b9abf39eaae97295645bd7915cd9ef8990d0e2694e2dff3ad"]
+metric_records [0.3, 0.9, 0.65, 0.0, 1.0, 0.3]
+select_records_3 ["H1", "H4", "H2"]
+select_records_all ["H1", "H4", "H2", "A9", "H0", "H3"]
+dag_default {"results": [true, true, false, "ValueError: Missing parent hypothesis ID: NOPE", true, false, true, true], "processed_ids": ["H0", "H1", "H2", "H0", "H4"], "hashes": ["d7b8ac2d5fb9abab54efcc5c5a3d1d0dc37644ec8ab6bb51ef46e2bceda43101", "d817680ffdf5cde75927a7d2c483894b2ac8c72b8ef62ce93e9a1d0da3ffc077", "721233b286b30e7ebdaba026f60b11706b3d4146d8cd0a117b5aac7e6de7bf4e", "d7b8ac2d5fb9abab54efcc5c5a3d1d0dc37644ec8ab6bb51ef46e2bceda43101", "7e19c60eb46f920fbd8ff85b04b9c454f4479a4c3e6d55a034026ae0485dae99"]}
+dag_small {"results": [true, true, false, false, false, false, false, false], "processed_ids": ["H0", "H1"], "hashes": ["12c9d140b9c78884fbc5b1066379ec056fea294371eec73b1b911dbbd267ddd1", "d817680ffdf5cde75927a7d2c483894b2ac8c72b8ef62ce93e9a1d0da3ffc077"]}
+unpack_cands [{"candidate_id": 3, "parent_id": 0, "generation": 1, "zero_real": 0.5, "zero_imag": 14.134725141734695, "eigenvalue_real": 14.134725141734695, "entropy": 0.69, "residual": 2.7e-11, "status": 1, "info_gain": 0.0, "novelty": 0.0, "obligation_progress": 0.0}, {"candidate_id": 1, "parent_id": 0, "generation": 0, "zero_real": 0.5, "zero_imag": 21.02203963877155, "eigenvalue_real": 21.0, "entropy": 1.1, "residual": 0.001, "status": 1, "info_gain": 0.0, "novelty": 0.0, "obligation_progress": 0.0}, {"candidate_id": 2, "parent_id": 1, "generation": 1, "zero_real": 0.51, "zero_imag": 25.0, "eigenvalue_real": 24.9, "entropy": 0.2, "residual": 0.4, "status": 2, "info_gain": 0.0, "novelty": 0.0, "obligation_progress": 0.0}, {"candidate_id": 7, "parent_id": 2, "generation": 2, "zero_real": 0.0, "zero_imag": 30.0, "eigenvalue_real": -1.5e-07, "entropy": 1e+22, "residual": 1e-05, "status": -1, "info_gain": 0.0, "novelty": 0.0, "obligation_progress": 0.0}, {"candidate_id": 5, "parent_id": 1, "generation": 1, "zero_real": 0.5, "zero_imag": 32.9, "eigenvalue_real": 32.9, "entropy": 0.69, "residual": 2.7e-11, "status": 1, "info_gain": 0.0, "novelty": 0.0, "obligation_progress": 0.0}]
