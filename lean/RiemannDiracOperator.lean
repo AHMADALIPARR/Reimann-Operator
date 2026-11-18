@@ -32,6 +32,16 @@ import Mathlib.Analysis.Calculus.Deriv
 
 namespace RiemannDiracOperator
 
+/-! ## Riemann Zeta Function (Stub for Spectral Correspondence) -/
+
+/-- Placeholder for the Riemann zeta function and its non-trivial zeros.
+    In a complete formalization this would come from Mathlib's analytic number theory
+    development. Here we treat non-trivial zeros as an abstract predicate. -/
+def RiemannZeta.nonTrivialZero (s : ℂ) : Prop :=
+  -- Non-trivial zeros are those with 0 < Re(s) < 1 (the critical strip)
+  -- excluding the trivial zeros at negative even integers.
+  (0 < s.re ∧ s.re < 1) ∧ ¬∃ n : ℕ, s = -2 * (n + 1)
+
 /-! ## Part 1: Adelic Geometry Setup -/
 
 /-- The Adeles ℚ_A are the restricted product of all p-adic completions of ℚ.
