@@ -8,6 +8,20 @@ on:
   workflow_dispatch:
 
 jobs:
+  native:
+    name: Fortran kernels + C23 ports (golden + oracle)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install gfortran
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build -j1
+      - name: ctest
+        run: ctest --test-dir build -j1 --output-on-failure
+
   lean:
     name: Lean (lean-checked, lake build)
     runs-on: ubuntu-latest
