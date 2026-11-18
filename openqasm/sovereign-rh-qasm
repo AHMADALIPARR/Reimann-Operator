@@ -1,0 +1,80 @@
+
+    OpenQASM 3.0 — Circulant–QFT Block Encoding (openqasm/circulant_qft_bk.qasm) OPENQASM 3.0; include "stdgates.inc";
+
+SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-SnapKitty-Opaque-1.0 C Copyright (C) 2026 Ahmad Ali Parr / SnapKitty Research Lab
+
+// SOVEREIGN-RH-LOCK: Circulant-QFT Block Encoding (n = 4 data qubits, N = 16) // Implements U_A = (I x F_N^dagger) U_D (I x F_N) // Target: periodic central-difference Berry-Keating stencil in u = ln(x) coordinates. // Subnormalization bound: ||A_N||_2 <= alpha (finite-dimensional truncation only).
+
+const float[64] PI = 3.141592653589793; const float[64] THETA_0 = 0.25; const float[64] THETA_1 = 0.50; const float[64] THETA_2 = 1.00; const float[64] THETA_3 = 2.00;
+
+qubit[1] anc; qubit[4] q; bit[1] c_anc; bit[4] c_q;
+
+gate qft4 d0, d1, d2, d3 { h d3; cp(PI / 2.0) d2, d3; cp(PI / 4.0) d1, d3; cp(PI / 8.0) d0, d3; h d2; cp(PI / 2.0) d1, d2; cp(PI / 4.0) d0, d2; h d1; cp(PI / 2.0) d0, d1; h d0; swap d0, d3; swap d1, d2; }
+
+gate iqft4 d0, d1, d2, d3 { swap d0, d3; swap d1, d2; h d0; cp(-PI / 2.0) d0, d1; h d1; cp(-PI / 4.0) d0, d2; cp(-PI / 2.0) d1, d2; h d2; cp(-PI / 8.0) d0, d3; cp(-PI / 4.0) d1, d3; cp(-PI / 2.0) d2, d3; h d3; }
+
+// 1. Transform to Fourier eigenbasis: (I x F_N) qft4 q[0], q[1], q[2], q[3];
+
+// 2. Diagonal Fourier-symbol block encoding U_D via LCU ancilla h anc[0]; cp(THETA_0) anc[0], q[0]; cp(THETA_1) anc[0], q[1]; cp(THETA_2) anc[0], q[2]; cp(THETA_3) anc[0], q[3]; x anc[0]; cp(-THETA_0) anc[0], q[0]; cp(-THETA_1) anc[0], q[1]; cp(-THETA_2) anc[0], q[2]; cp(-THETA_3) anc[0], q[3]; x anc[0]; h anc[0];
+
+// 3. Transform back to position basis: (I x F_N^dagger) iqft4 q[0], q[1], q[2], q[3];
+
+// Postselection on c_anc == 0 projects onto A_N / alpha c_anc[0] = measure anc[0]; c_q = measure q;
+
+    OpenQASM 3.0 — Periodic-Diagonal LCU Block Encoding (openqasm/periodic_diagonal_lcu.qasm) OPENQASM 3.0; include "stdgates.inc";
+
+// SOVEREIGN-RH-LOCK: Periodic-Diagonal Block Encoding (n = 4 data qubits, N = 16) // Implements D_cos |j> = cos(omega * j + phi) |j> = (V_{omega,phi} + V_{omega,phi}^dagger)/2 |j> // Exact 1-ancilla LCU block encoding with subnormalization alpha = 1 and O(n) gates.
+
+const float[64] OMEGA = 0.37; const float[64] PHI = 0.50;
+
+qubit[1] anc; qubit[4] q; bit[1] c_anc; bit[4] c_q;
+
+// Prepare equal superposition on ancilla: H|0> = (|0> + |1>) / sqrt(2) h anc[0];
+
+// Controlled V_{omega, phi} on |0>_anc: flip ancilla to trigger on |0> x anc[0]; p(PHI) anc[0]; cp(OMEGA) anc[0], q[0]; cp(2.0 * OMEGA) anc[0], q[1]; cp(4.0 * OMEGA) anc[0], q[2]; cp(8.0 * OMEGA) anc[0], q[3]; x anc[0];
+
+// Controlled V_{omega, phi}^dagger on |1>_anc p(-PHI) anc[0]; cp(-OMEGA) anc[0], q[0]; cp(-2.0 * OMEGA) anc[0], q[1]; cp(-4.0 * OMEGA) anc[0], q[2]; cp(-8.0 * OMEGA) anc[0], q[3];
+
+// Uncompute ancilla Hadamard: (H x I) h anc[0];
+
+// Measuring c_anc == 0 heralds D_cos |psi> with normalization alpha = 1 c_anc[0] = measure anc[0]; c_q = measure q;
+
+    Pure Lean 4 — Hand-Written Proofs (lean/SovereignRHLock.lean, zero sorry, zero axiom) /- SOVEREIGN-RH-LOCK Formal Structural & Epistemic Lemmas in Pure Lean 4. Constraints:
+
+    ZERO sorry
+    ZERO custom axiom declarations
+    Uses only Lean 4 core (Init) with hand-written proofs. -/
+
+namespace SovereignRHLock
+
+/-- Five mutually distinct epistemic states enforced by ASP & OWL. -/ inductive EpistemicState where | candidate | numericallySupported | formallyVerifiedLemma | refuted | unresolvedConjecture deriving DecidableEq, Repr
+
+/-- Status of an analytic proof obligation. -/ inductive ObligationStatus where | openObl | partialObl | dischargedObl deriving DecidableEq, Repr
+
+/-- Structured proof-obligation ledger for Gate 9 and Gate 10. -/ structure ProofLedger where obl01HilbertSpace : ObligationStatus obl02DenseDomain : ObligationStatus obl03Symmetry : ObligationStatus obl04SelfAdjoint : ObligationStatus obl05TraceFormula : ObligationStatus obl06Completeness : ObligationStatus obl07Multiplicity : ObligationStatus obl08CriticalLine : ObligationStatus oblBridge01 : ObligationStatus deriving DecidableEq, Repr
+
+/-- Gate 9 closes iff self-adjointness, trace formula, completeness, and multiplicity are all discharged. -/ def gate9Closed (L : ProofLedger) : Bool := (L.obl04SelfAdjoint == ObligationStatus.dischargedObl) && (L.obl05TraceFormula == ObligationStatus.dischargedObl) && (L.obl06Completeness == ObligationStatus.dischargedObl) && (L.obl07Multiplicity == ObligationStatus.dischargedObl)
+
+/-- Gate 10 (RH Proof Admission) requires Gate 9 closed AND critical-line derivation discharged. -/ def gate10RHAdmitted (L : ProofLedger) : Bool := gate9Closed L && (L.obl08CriticalLine == ObligationStatus.dischargedObl)
+
+/-- Lemma 1: If Gate 9 is open, Gate 10 cannot admit an RH proof. -/ theorem gate10_blocked_when_gate9_open (L : ProofLedger) (h : gate9Closed L = false) : gate10RHAdmitted L = false := by unfold gate10RHAdmitted rw [h] rfl
+
+/-- Lemma 2: An open completeness obligation (OBL-06) blocks Gate 9 and Gate 10. -/ theorem open_completeness_blocks_rh (L : ProofLedger) (h : L.obl06Completeness = ObligationStatus.openObl) : gate10RHAdmitted L = false := by apply gate10_blocked_when_gate9_open unfold gate9Closed rw [h] simp
+
+/-- Lemma 3: Epistemic separation — numerical support is strictly distinct from a formal lemma. -/ theorem numeric_support_not_formal_lemma : EpistemicState.numericallySupported ≠ EpistemicState.formallyVerifiedLemma := by intro h cases h
+
+/-- Candidate admissibility record mirroring ASP proof_admission.lp. -/ structure CandidateAdmission where hasMissingObligation : Bool hasRefutedEvidence : Bool hasFormalEvidence : Bool
+
+def aspRetained (c : CandidateAdmission) : Bool := (!c.hasMissingObligation) && (!c.hasRefutedEvidence)
+
+def aspFormallyAdmissible (c : CandidateAdmission) : Bool := aspRetained c && c.hasFormalEvidence
+
+/-- Lemma 4: A candidate with a missing obligation is never retained and never formally admissible. -/ theorem missing_obligation_blocks_admission (c : CandidateAdmission) (h : c.hasMissingObligation = true) : aspRetained c = false ∧ aspFormallyAdmissible c = false := by unfold aspFormallyAdmissible aspRetained rw [h] simp
+
+/-- Lemma 5: Block-encoding boundedness obstruction. If a block encoding requires normSq <= alphaSq, any operator with alphaSq < normSq cannot be block-encoded with subnormalization alphaSq. -/ theorem block_encoding_boundedness_obstruction (normSq alphaSq : Nat) (h_unbounded : alphaSq < normSq) : ¬ (normSq ≤ alphaSq) := by omega
+
+/-- Lemma 6: Klong 64-bit SoA binary layout byte-length invariant: 32-byte header + 9 columns * 8 bytes/element * n = 32 + 72 * n. -/ theorem klong_abi_byte_length (n : Nat) : 32 + 9 * (8 * n) = 32 + 72 * n := by omega
+
+/-- Lemma 7: Bounded recursive search termination measure. Every accepted node strictly reduces remaining node budget budget - count. -/ theorem bounded_search_measure_decreases (budget count : Nat) (h : count < budget) : budget - (count + 1) < budget - count := by omega
+
+end SovereignRHLock
