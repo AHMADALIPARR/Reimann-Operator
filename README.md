@@ -67,6 +67,8 @@ python -c "from torch.spectral import zeta_residual; print(zeta_residual(0.5, 14
 │   └── candidate_optimizer.py
 ├── klong/                         # Flat-array interchange adapter
 │   └── interchange.k
+├── docs/                          # Visual artifacts
+│   └── zeta_cyberpunk_ascii.txt   # Legacy of the Universal Object (ASCII)
 ├── lakefile.toml
 ├── lean-toolchain
 └── LICENSE                       # AGPLv3
@@ -78,6 +80,7 @@ python -c "from torch.spectral import zeta_residual; print(zeta_residual(0.5, 14
 - **Numerical evidence ≠ formal proof**: Residual thresholds and entropy scores are search heuristics and screening gates only. They never promote a conjecture to a theorem.
 - **Provenance**: Numerically pruned candidates remain recorded in an append-only SHA-256 ledger (status = pruned).
 - **Self-adjointness lock**: The Lean development encodes the principle that denying the critical-line conclusion requires denying either the existence of adeles, the axioms of functional analysis, or the definition of self-adjointness.
+- **Legacy of the Universal Object**: See `docs/zeta_cyberpunk_ascii.txt` for the spectral manifest.
 
 ## Status
 
