@@ -8,3 +8,5 @@ That file contains:
 3. The full set of hand-written lemmas (`SovereignRHLock` namespace) — zero `sorry`, zero custom axioms, Lean 4 core only
 
 The individual OpenQASM sources remain in `openqasm/` for direct circuit execution, and the pure Lean lemmas also remain in `lean/SovereignRHLock.lean` for the checked build.
+
+**Authors:** Ahmad Ali Parr and Jessica Westerhoff, SnapKitty Collective Research Team.
